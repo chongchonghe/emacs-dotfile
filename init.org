@@ -4,22 +4,19 @@
 #+STARTUP: content
 #+SETUPFILE: /Users/chongchonghe/Documents/computer/emacs/org_export/theme-readtheorg.setup
 
+[toc]
+
 * About
 
-This is my Emacs configuration file written in Org mode. It is an
-attempt to keep my =~/.emacs.d/init.el= file organized and readable,
-as Emacs configuration could be a life-long practice.
+This is my Emacs configuration file written in Org mode. It is an attempt to keep my =~/.emacs.d/init.el= file organized and readable, as Emacs configuration could be a life-long practice.
 
-The general structure of this org-file is inspired by [[https://github.com/larstvei/dot-emacs/blob/master/init.org][this github
-repository]].
+The general structure of this org-file is inspired by [[https://github.com/larstvei/dot-emacs/blob/master/init.org][this github repository]].
 
 ** How to use this configuration
 
-- Execute =C-c C-v t= to exported everything between ~#+BEGIN_SRC
-  emacs-lisp~ and ~#+END_SRC~ to init.el, the init file of Emacs
+- Execute =C-c C-v t= to exported everything between ~#+BEGIN_SRC emacs-lisp~ and ~#+END_SRC~ to init.el, the init file of Emacs
 - Editing tips:
-  - Use =C-c '= to edit a code block in an individual buffer in an
-    individual buffer.
+  - Use =C-c '= to edit a code block in an individual buffer in an individual buffer.
 
 ** Resources
 
@@ -31,8 +28,7 @@ Here is a list of resources where I learned to configure Emacs
 
 - [[https://blog.d46.us/advanced-emacs-startup/][Advanced Techniques for Reducing Emacs Startup Time]]
 
-- Syncing Custom Set Variables:
-  https://assortedarray.com/posts/my-init-org-setup/
+- Syncing Custom Set Variables: https://assortedarray.com/posts/my-init-org-setup/
 
 *** Dot Emacs files
 
@@ -44,12 +40,10 @@ Here is a list of resources where I learned to configure Emacs
 
 - [ ] make =custom-set-variables= not being overwritten by tangle
 - what is ERC?
--
 
 ** Start to use this configuration
 
-When this configuration is loaded for the first time, the init.el is
-the file that is loaded. It should look like this:
+When this configuration is loaded for the first time, the init.el is the file that is loaded. It should look like this:
 
 #+BEGIN_SRC emacs-lisp :tangle no
   ;; This file replaces itself with the actual configuration at first run.
@@ -66,13 +60,9 @@ the file that is loaded. It should look like this:
   (byte-compile-file (concat user-emacs-directory "init.el"))
 #+END_SRC
 
-It tangles the org-file, so that this file is overwritten with the
-actual configuration. Afterwards, this is not needed, because we can
-use =C-c C-v t= to run =org-babel-tangle=, which does the same job.
+It tangles the org-file, so that this file is overwritten with the actual configuration. Afterwards, this is not needed, because we can use =C-c C-v t= to run =org-babel-tangle=, which does the same job.
 
-Alternatively, we can add the following configuration to execute
-=org-babel-tangle= after changes. I prefer to not enable this and do
-it manually.
+Alternatively, we can add the following configuration to execute =org-babel-tangle= after changes. I prefer to not enable this and do it manually.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; -*- mode: emacs-lisp -*-
@@ -91,8 +81,7 @@ it manually.
   (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
-(Not in use) The following config is a common optimization to temporarily disable
-garbage collection during initialization.
+(Not in use) The following config is a common optimization to temporarily disable garbage collection during initialization.
 
 #+BEGIN_SRC emacs-lisp :tangle no
   ;; -*- mode: emacs-lisp -*-
@@ -143,8 +132,7 @@ garbage collection during initialization.
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
 #+END_SRC
 
-Use =M-x package-refresh-contents= to reload the list of packages
-after adding these for the first time.
+Use =M-x package-refresh-contents= to reload the list of packages after adding these for the first time.
 
 *** Use-package
 
