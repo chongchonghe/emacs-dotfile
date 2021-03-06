@@ -1,8 +1,8 @@
 # -*- mode: snippet -*-
-# name: bash
-# key: sh_
+# name: python
+# key: python
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
 # --
-#+BEGIN_SRC sh
+#+BEGIN_SRC python
   $0
 #+END_SRC

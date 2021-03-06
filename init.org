@@ -1,10 +1,9 @@
-#+title: ChongChong's Emacs configuration file
+#+title: ChongChong He's Emacs Configuration File
 #+AUTHOR: Chong-Chong He
 #+PROPERTY: header-args :tangle yes :results silent
 #+STARTUP: content
 #+SETUPFILE: /Users/chongchonghe/Documents/computer/emacs/org_export/theme-readtheorg.setup
-
-[toc]
+#+OPTIONS: H:3 toc:3 num:3
 
 * About
 
@@ -12,11 +11,21 @@ This is my Emacs configuration file written in Org mode. It is an attempt to kee
 
 The general structure of this org-file is inspired by [[https://github.com/larstvei/dot-emacs/blob/master/init.org][this github repository]].
 
-** How to use this configuration
+** If you want to use this dotfile
 
-- Execute =C-c C-v t= to exported everything between ~#+BEGIN_SRC emacs-lisp~ and ~#+END_SRC~ to init.el, the init file of Emacs
-- Editing tips:
+- Make a backup of your own =~/.emacs.d/=
+- Copy =init.org= and =init.el.tangle= to =~/.emacs.d/= and rename =init.el.tangle= to =init.el=
+- Open your Emacs
+
+** How to update this dotfile
+
+- Edit this file.
+- Execute =C-c C-v t= to exported everything in blocks that start with ~#+BEGIN_SRC emacs-lisp~ and end with ~#+END_SRC~ to init.el.
+
+** Editing tips
+
   - Use =C-c '= to edit a code block in an individual buffer in an individual buffer.
+  - =lisp<tab>= to insert a ~#+BEGIN_SRC emacs-lisp~ ~#+END_SRC~ block.
 
 ** Resources
 
@@ -24,22 +33,29 @@ Here is a list of resources where I learned to configure Emacs
 
 *** Articles
 
+- [[https://caiorss.github.io/Emacs-Elisp-Programming/Elisp_Programming.html#sec-1][Elisp Programming]]
+
 - [[https://medium.com/@holzman.simon/emacs-on-macos-catalina-10-15-in-2019-79ff713c1ccc][Emacs on MacOS Catalina 10.15 in 2̶0̶1̶9̶ 2020]]
 
 - [[https://blog.d46.us/advanced-emacs-startup/][Advanced Techniques for Reducing Emacs Startup Time]]
 
 - Syncing Custom Set Variables: https://assortedarray.com/posts/my-init-org-setup/
 
+- [[http://doc.norang.ca/org-mode.html#Refiling][Org Mode - Organize Your Life In Plain Text!]]
+
 *** Dot Emacs files
 
+- https://github.com/yanghaoxie/emacs-dotfile
 - [[https://akirakyle.com/dotfile/dotfile.html#org83b9c8b][One Dotfile to rule them all!]]
 - dakrone-dotfiles: https://github.com/dakrone/dakrone-dotfiles/blob/master/emacs.org
 - Juan José García Ripoll: http://juanjose.garciaripoll.com/blog/my-emacs-windows-configuration/index.html
+- org config: https://hugocisneros.com/org-config/
+- [[https://huadeyu.tech/tools/emacs-setup-notes.html][极简Emacs开发环境配置]]
 
 ** TODO
 
-- [ ] make =custom-set-variables= not being overwritten by tangle
 - what is ERC?
+- [[http://ergoemacs.org/emacs/elisp_next_prev_user_buffer.html][Emacs: Next/Previous User Buffer]]
 
 ** Start to use this configuration
 
@@ -67,18 +83,17 @@ Alternatively, we can add the following configuration to execute =org-babel-tang
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; -*- mode: emacs-lisp -*-
 
-  (defun tangle-init ()
-    "If the current buffer is 'init.org' the code-blocks are
-  tangled, and the tangled file is compiled."
-    (when (equal (buffer-file-name)
-                 ;; (expand-file-name (concat user-emacs-directory "init.org")))
-                 "/Users/chongchonghe/system-essentials/emacs/init.org")
-      ;; Avoid running hooks when tangling.
-      (let ((prog-mode-hook nil))
-        (org-babel-tangle)
-        (byte-compile-file (concat user-emacs-directory "init.el")))))
-
-  (add-hook 'after-save-hook 'tangle-init)
+  ;; (defun tangle-init ()
+  ;;       "If the current buffer is 'init.org' the code-blocks are
+  ;; tangled, and the tangled file is compiled."
+  ;;       (when (equal (buffer-file-name)
+  ;; 			       ;; (expand-file-name (concat user-emacs-directory "init.org")))
+  ;; 			       "/Users/chongchonghe/dotfiles/emacs/init.org")
+  ;; 	;; Avoid running hooks when tangling.
+  ;; 	(let ((prog-mode-hook nil))
+  ;; 	      (org-babel-tangle)
+  ;; 	      (byte-compile-file (concat user-emacs-directory "init.el")))))
+  ;; (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
 (Not in use) The following config is a common optimization to temporarily disable garbage collection during initialization.
@@ -98,11 +113,9 @@ Alternatively, we can add the following configuration to execute =org-babel-tang
 - ~Debugger entered--Lisp error: (void-variable personal-keybindings)~
   - ~(use-package org)~
 
-* Configurations
+* Emacs initialization
 
-** Emacs initialization
-
-*** Very basics
+** Initialization
 
 #+BEGIN_SRC emacs-lisp
 
@@ -123,7 +136,7 @@ Alternatively, we can add the following configuration to execute =org-babel-tang
   ;;     ))
 #+END_SRC
 
-*** Add package sources
+** Add package sources
 
 #+BEGIN_SRC emacs-lisp
 (unless (assoc-default "melpa" package-archives)
@@ -134,9 +147,9 @@ Alternatively, we can add the following configuration to execute =org-babel-tang
 
 Use =M-x package-refresh-contents= to reload the list of packages after adding these for the first time.
 
-*** Use-package
+** Use-package
 
-**** Usage
+*** Usage
 
 To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
 
@@ -146,7 +159,7 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
     :load-path "~/.emacs.d/lib/si-general.el")
 #+end_src
 
-**** Config
+*** Config
 
 #+BEGIN_SRC emacs-lisp
   ;; This is only needed once, near the top of the file
@@ -172,7 +185,9 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
   ;; (use-package better-defaults)
 #+END_SRC
 
-** General configuration
+* General configuration
+
+** Fundamentals
 
 #+BEGIN_SRC emacs-lisp
   ;; remove backup files (e.g. README.md~)
@@ -194,9 +209,12 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
   (setq inhibit-startup-screen t)
   ;; Search only visible 
   (setq search-invisible nil)
+  (setq column-number-mode t)
+  (setq x-select-enable-clipboard t)
+  ;; (desktop-save-mode 1)
 #+END_SRC
 
-*** Use CMD key for meta
+** Use CMD key for meta
 
 #+begin_src emacs-lisp
   ;; Use cmd key for meta
@@ -204,10 +222,10 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
   (setq mac-option-key-is-meta nil
         mac-command-key-is-meta t
         mac-command-modifier 'meta
-        mac-option-modifier 'none)
+        mac-option-modifier 'super)
 #+end_src
 
-*** Reload
+** Reload
 
 #+begin_src emacs-lisp
 (defun my/reload-emacs-configuration ()
@@ -215,7 +233,7 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
   (load-file "~/.emacs.d/init.el"))
 #+end_src
 
-*** Column marker at 80
+** Column marker at 80
 
 #+begin_src emacs-lisp
   (setq-default
@@ -225,11 +243,11 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
   (add-hook 'prog-mode-hook #'whitespace-mode)
 #+end_src
 
-*** Set encoding
+** Set encoding
 
 #+begin_src emacs-lisp
   ;; set encoding
-  (set-language-environment "UTF-8")
+  (set-language-environment "utf-8")
   (set-default-coding-systems 'utf-8)
   ;; (set-buffer-file-coding-system 'utf-8-unix)
   ;; (set-clipboard-coding-system 'utf-8-unix)
@@ -242,13 +260,14 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
   (prefer-coding-system 'utf-8)
 #+end_src
 
-*** Compile
+** Compile
 
 #+begin_src emacs-lisp :tangle yes
+  (setq compile-command "make ")
   (global-set-key (kbd "C-c r") #'recompile)
 #+end_src
 
-*** Shared functions
+** Shared functions
 
 #+begin_src emacs-lisp :tangle yes
   (defun no-auto-fill ()
@@ -258,9 +277,18 @@ To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
     )
 #+end_src
 
-*** ?
+** Clipboard (not working)
 
-** Themes and fonts
+simpleclip (https://github.com/rolandwalker/simpleclip)
+
+#+begin_src emacs-lisp :tangle no
+  (use-package simpleclip
+	:defer t
+	:config
+	(simpleclip-mode 1))
+#+end_src
+
+* Themes and fonts
 
 The following is an example of installing a theme
 
@@ -271,21 +299,42 @@ The following is an example of installing a theme
   (require 'moe-theme)
 #+end_src
 
-The theme
+The tsdh theme (disabled). Replaced with doom theme
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   ;;customize theme
   (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
   (add-to-list 'load-path "~/.emacs.d/themes/")
   (require 'tsdh-light-theme)
-  (set-background-color "#d4cec3")
+  ;; (set-background-color "#d4cec3")
+  (set-background-color "#e6e3df")
+#+end_src
+
+Try doom theme
+
+#+begin_src emacs-lisp :tangle yes
+  (defun my/theme-light ()
+		(interactive)
+		(load-theme 'doom-one-light t))
+  (defun my/theme-dark ()
+	(interactive)
+		(load-theme 'doom-one t))
+
+  (use-package doom-themes
+		:config
+		;; Global settings (defaults)
+		(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	  doom-themes-enable-italic t) ; if nil, italics is universally disabled
+		(load-theme 'doom-one t)
+		;; (load-theme 'doom-one-light t)
+		)
 #+end_src
 
 Fonts
 
 #+begin_src emacs-lisp
   ;; Default font
-  (set-face-attribute 'default nil :font "Monaco-16")
+  (set-face-attribute 'default nil :font "Monaco-15")
 
   ;; mixed-pitch, https://gitlab.com/jabranham/mixed-pitch
   (use-package mixed-pitch
@@ -305,6 +354,11 @@ Fonts
 	 `(org-document-title ((t (:family "Helvetica Neue" :height 2.0 :underline nil))))
 	 )
 	)
+#+end_src
+
+Window size (wide high, in chars)
+#+begin_src emacs-lisp :tangle yes
+  (when window-system (set-frame-size (selected-frame) 130 50))
 #+end_src
 
 Here are some more sofisticated config (not being used)
@@ -343,21 +397,15 @@ Here are some more sofisticated config (not being used)
   ;;  )
 #+end_src
 
-
 Chinese Font
 #+begin_src emacs-lisp :tangle yes
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
                       charset (font-spec :family "PingFang SC"
-                                         :size 16)))
+                                         :size 15)))
 #+end_src
 
-Window size (wide high, in chars)
-#+begin_src emacs-lisp :tangle yes
-  (when window-system (set-frame-size (selected-frame) 84 50))
-#+end_src
-
-** evil
+* evil
 
 Ref: http://evgeni.io/posts/quick-start-evil-mode/
 
@@ -385,6 +433,8 @@ Ref: http://evgeni.io/posts/quick-start-evil-mode/
   ;;   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
   ;;   )
 
+  ;; DO NOT PUT EVIL INTO USE-PACKAGE because other part of this dotfile 
+  ;; relies on it
   (require 'evil)
   ;; (setq evil-want-integration nil) ;; required by evil-collection
   ;; (setq evil-want-keybinding nil)
@@ -398,6 +448,7 @@ Ref: http://evgeni.io/posts/quick-start-evil-mode/
   (setq-default evil-cross-lines t)
   (setq key-chord-two-keys-delay 0.4)
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+  ;; (define-key evil-insert-state-map (kbd "M-v") 'yank)
 
   ;; (use-package evil-collection
   ;;   :after evil
@@ -421,38 +472,33 @@ Treat underscore as part of a word. [[https://emacs.stackexchange.com/a/27350/26
   ;; (add-hook 'ruby-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 #+end_src
 
-** shared.el 
-
-loading from =~/system-essentials/emacs/share.org=
-
-#+begin_src emacs-lisp
-  ;; (load-file "./share.el")
-#+end_src
-
-** org
+* org
 
 I use [[http://www.orgmode.org][Org Mode]] to take notes, write my agenda, and do all sorts of stuff.
 
-*** Usage
+** Usage
 
-**** Key-bindings
+*** Key-bindings
 
-| Editing   |                                  |
-|-----------+----------------------------------|
+| Editing |                                  |
+|---------+----------------------------------|
 | ~C-c i~   | clock-in (and start toggl timer) |
 | ~C-c C-p~ | org-cliplink                     |
 | ~C-c '~   | edit babel code block.           |
-|           |                                  |
 
 | org-agenda |                                            |
 |------------+--------------------------------------------|
-| ~C-c t~    | org-todo                                   |
-| ~C-c c~    | org-capture                                |
-| ~C-c a~    | org agenda                                 |
-| ~f/b/.~    | move forward/backword/today in agenda view |
-|            |                                            |
+| ~C-c t~      | org-todo                                   |
+| ~C-c c~      | org-capture                                |
+| ~C-c a~      | org agenda                                 |
+| ~f/b/.~      | move forward/backword/today in agenda view |
 
-**** My org files
+| latex |                   |
+|-------+-------------------|
+| C-p   | org-latex-preview |
+| C-M-p | org-fragtog-mode  |
+
+*** My org files
 
 Here are the Org files I use.
 
@@ -460,7 +506,7 @@ Here are the Org files I use.
 | agenda.org | Agenda file                              |
 | todos.org  | Org todo file                            |
 
-*** Basics
+** Basics
 
 #+begin_src emacs-lisp
   (require 'org)
@@ -478,7 +524,6 @@ Here are the Org files I use.
         (setq org-hide-emphasis-markers nil)
       (setq org-hide-emphasis-markers t)))
 #+end_src
-
 
 Disable descriptive (hidden) links [[https://emacs.stackexchange.com/questions/5387/show-org-mode-hyperlink-as-plain-text/5417][(Reference)]]. Disabled. Use ~C-c
 C-l~ to edit a link.
@@ -551,9 +596,15 @@ Unknown
     )
 #+end_src
 
-*** Key-bindings
+inline image size
 
-Global keys
+#+begin_src emacs-lisp :tangle yes
+(setq org-image-actual-width 500) 
+#+end_src
+
+** Key-bindings
+
+*** Global keys
 
 #+begin_src emacs-lisp
   (bind-key "C-c c" 'org-capture)
@@ -561,28 +612,34 @@ Global keys
   (bind-key "C-c t" 'org-todo)
 #+end_src
 
-Local keys
+*** Local keys
 
 #+begin_src emacs-lisp
   (defun my-org-mode-config ()
-    (local-set-key "\M-n" 'outline-next-visible-heading)
-    (local-set-key "\M-p" 'outline-previous-visible-heading)
-    ;; table
-    (local-set-key "\C-\M-w" 'org-table-copy-region)
-    (local-set-key "\C-\M-y" 'org-table-paste-rectangle)
-    (local-set-key "\C-\M-l" 'org-table-sort-lines)
-    ;; display images
-    (local-set-key "\M-I" 'org-toggle-iimage-in-org)
-    ;; TODOlist
-    ;; fix tab
-    (local-set-key "\C-y" 'yank)
-    (local-set-key "\M-h" 'windmove-left)
-    (local-set-key "\C-cl" 'grg-store-link)
-    (local-set-key "\C-cb" 'org-switchb)
-    (setq-local truncate-lines 'nil)
-    ;; (org-indent-mode)  ;; not working?
-    )
+		(local-set-key "\M-n" 'outline-next-visible-heading)
+		(local-set-key "\M-p" 'outline-previous-visible-heading)
+		;; table
+		(local-set-key "\C-\M-w" 'org-table-copy-region)
+		(local-set-key "\C-\M-y" 'org-table-paste-rectangle)
+		(local-set-key "\C-\M-l" 'org-table-sort-lines)
+		;; display images
+		(local-set-key "\M-I" 'org-toggle-iimage-in-org)
+		;; TODOlist
+		;; fix tab
+		;; (local-set-key "\C-y" 'yank)
+		(local-set-key "\M-h" 'windmove-left)
+		(local-set-key "\C-cl" 'grg-store-link)
+		(local-set-key "\C-cb" 'org-switchb)
+		(local-set-key "\C-cp" 'org-display-inline-images)
+		(setq-local truncate-lines 'nil)
+		;; (org-indent-mode)  ;; not working?
+		)
   (add-hook 'org-mode-hook 'my-org-mode-config)
+
+  (with-eval-after-load 'evil-maps
+		(define-key evil-normal-state-map (kbd "C-p") 'org-latex-preview)
+		(define-key evil-normal-state-map (kbd "C-M-p") 'org-fragtog-mode))
+  ;; (define-key org-mode-map (kbd "C-p") 'org-latex-preview)
 #+end_src
 
 Not used:
@@ -601,7 +658,7 @@ Not used:
   ;; (evil-define-key 'normal org-mode-map (kbd ", ,") 'org-insert-structure-template)
 #+end_src
 
-rename-file-and-buffer 
+*** rename-file-and-buffer 
 
 #+begin_src emacs-lisp :tangle yes
   ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
@@ -621,7 +678,28 @@ rename-file-and-buffer
             (set-buffer-modified-p nil))))))
 #+end_src
 
-*** Appearance
+*** evil-org-mode
+
+https://github.com/Somelauw/evil-org-mode
+
+#+begin_src emacs-lisp :tangle yes
+  ;; evil key-bindings
+  ;; (define-key org-agenda-mode-map "j" 'evil-next-line)
+  ;; (define-key org-agenda-mode-map "k" 'evil-previous-line)
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package evil-org
+	:ensure t
+	:after org
+	:hook (org-mode . (lambda () evil-org-mode))
+	:config
+	(evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))
+	(require 'evil-org-agenda)
+	(evil-org-agenda-set-keys))
+#+end_src
+
+** Appearance
 
 Set up a font-lock substitution for list markers (I always use “-” for lists, but you can change this if you want) by replacing them with a centered-dot character: ([[https://zzamboni.org/post/beautifying-org-mode-in-emacs/][Ref]])
 
@@ -635,6 +713,40 @@ Set up a font-lock substitution for list markers (I always use “-” for lists
 Proportional font, in different sizes, for the headlines. The fonts listed will be tried in sequence, and the first one found will be used.
 
 Beautify org mode
+
+Org-superstar ([[https://hugocisneros.com/org-config/][reference]])
+
+#+begin_src emacs-lisp :tangle yes
+  ;; (use-package org-bullets
+  ;;       :init
+  ;;       (add-hook 'org-mode-hook #'org-bullets-mode)
+  ;;       (setq org-bullets-bullet-list '("⚫" "◆" "◉" "▶" "◇"))
+  ;;       )
+  (setq-default org-list-indent-offset 4)
+  (use-package org-superstar              ; supersedes `org-bullets'
+				:ensure
+				:after org
+				:config
+				;; Every non-TODO headline now have no bullet
+				(setq org-superstar-headline-bullets-list '("\u200b"))
+				(setq org-superstar-leading-bullet "\u200b")
+				(setq org-superstar-item-bullet-alist
+	  '((?+ . ?+)
+					(?* . ?➤)
+					(?- . ?•)))
+				;; Enable custom bullets for TODO items
+				(setq org-superstar-special-todo-items t)
+				(setq org-superstar-todo-bullet-alist
+	  '(("TODO" "☐")
+					("NEXT" "✒")
+					("HOLD" "✰")
+					("WAIT" "☕")
+					("CXLD" "✘")
+					("DONE" "✔")))
+				(org-superstar-restart))
+  ;; (setq org-ellipsis "⤵")
+  ;; (setq org-ellipsis "▼")
+#+end_src
 
 #+begin_src emacs-lisp :tangle yes
   ;; simple version, only change font size
@@ -669,7 +781,7 @@ Beautify org mode
   ;; (setq org-ellipsis "⤵")
 #+end_src
 
-*** Embed local video
+** Embed local video
 
 Adapted from this method:
 http://endlessparentheses.com/embedding-youtube-videos-with-org-mode-links.html.
@@ -738,7 +850,7 @@ Other unknown config
   ;; (require 'org-mu4e)
 #+end_src
 
-*** Org babel
+** org babel
 
 Ref: https://www.juliabloggers.com/julia-with-emacs-org-mode/
 #+begin_src emacs-lisp
@@ -788,24 +900,33 @@ Display errors and warnings in an org-mode code block. [[https://emacs.stackexch
   (setq org-babel-eval-verbose t)
 #+end_src
 
-*** Org todo and agenda
+Indentation
 
-**** Config
+#+begin_src emacs-lisp :tangle yes
+(setq org-src-preserve-indentation t) 
+#+end_src
+
+** org todo and agenda
+
+*** Config
 
 #+BEGIN_SRC emacs-lisp
   (evil-define-key 'normal org-mode-map (kbd "t") 'org-todo)
+  (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo-list)
+  (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo-list)
+  (define-key evil-normal-state-map (kbd "C-a") 'org-agenda-list)
 
   (with-eval-after-load 'org
-	;; (setq org-directory "/Users/chongchonghe/Dropbox/orgfiles")
-	(setq org-agenda-files '("~/Dropbox/orgfiles/todos.org"
-				 "~/Dropbox/orgfiles/notes.org"
-				 "~/Dropbox/orgfiles/tasks"))
-	;; (setq org-agenda-files
-	;; 	"~/Dropbox/orgfiles/agenda.org")
-	(setq org-default-notes-file "~/Dropbox/orgfiles/todos.org")
-	(setq org-agenda-confirm-kill t)
-	;;open agenda in current window
-	(setq org-agenda-window-setup (quote current-window)))
+					;; (setq org-directory "/Users/chongchonghe/Dropbox/orgfiles")
+					(setq org-agenda-files '("~/Dropbox/orgfiles/todos.org"
+								 "~/Dropbox/orgfiles/notes.org"
+								 "~/Dropbox/orgfiles/tasks"))
+					;; (setq org-agenda-files
+					;; 	"~/Dropbox/orgfiles/agenda.org")
+					(setq org-default-notes-file "~/Dropbox/orgfiles/todos.org")
+					(setq org-agenda-confirm-kill t)
+					;;open agenda in current window
+					(setq org-agenda-window-setup (quote current-window)))
 #+END_SRC
 
 A week view spanning the current day
@@ -832,11 +953,11 @@ Not used
   ;;   :ensure t)
 #+end_src
 
-**** Org capture
+*** Org capture
 
 References: https://www.youtube.com/watch?v=KdcXu_RdKI0
-Templates:
 
+Templates:
 #+BEGIN_SRC emacs-lisp :tangle no
     (setq org-capture-templates
           '(("t"              ; hotkey
@@ -852,28 +973,29 @@ Generally, use =%u/U= (inactive timestamp, [time]) instead of =%t/T=
 (active timestamp, <time>), because I don't want the creation of a
 todo item in the agenda. Use =%a= for annotation.
 
+My configuration:
 #+BEGIN_SRC emacs-lisp
   (with-eval-after-load 'org
     (setq org-capture-templates
-          '(("t" "Todo (without links)" entry (file+headline "" "Tasks")
-             "* TODO [#A] %?\n %U\n" :empty-lines-before 1)
-            ("a" "Tasks (with links)" entry (file+headline "" "Tasks")
-             "* TODO [#A] %?\n  %U\n  %a\n" :empty-lines-before 1 :empty-lines-after 1)
+          '(("t" "Todo" entry (file+headline "" "Tasks")
+             "* TODO [#A] %?\n %U\n\n" :empty-lines-before 1)
+            ("a" "Todo with link" entry (file+headline "" "Tasks")
+             "* TODO [#A] %?\n  %U\n  %a\n\n" :empty-lines-before 1 :empty-lines-after 1)
             ("n" "Notes" entry (file+headline "~/Dropbox/orgfiles/notes.org" "Notes")
-             "* %?\n  %U\n" :empty-lines-before 1)
+             "* %?\n  %U\n\n" :empty-lines-before 1)
             ("i" "Ideas" entry (file+headline "~/Dropbox/orgfiles/notes.org" "Ideas")
-             "* %?\n  %u\n" :empty-lines-before 1)
+             "* %?\n  %u\n\n" :empty-lines-before 1)
             ("f" "Followup" entry (file+headline "" "Followup")
-             "* FLUP [#B] %?\n  %U\n  %a\n" :empty-lines-before 1)
+             "* FLUP [#B] %?\n  %U\n  %a\n\n" :empty-lines-before 1)
             ("l" "Later" entry (file+headline "" "Later (emails or tasks)")
-             "* TODO [#D] %?\n  %U\n  %a\n" :empty-lines-before 1)
+             "* TODO [#D] %?\n  %U\n  %a\n\n" :empty-lines-before 1)
             ;; ("g" "General todo" entry (file+headline "/Users/chongchonghe/tasks.org" "Tasks")
             ;;  "* TODO [#B] %?\n %a" :empty-lines 1)
             )
           ))
 #+END_SRC
 
-**** Todo and Priority
+*** Todo and Priority
 
 To set the priority of the current headline, do ~C-c ,~, or
 ~S-UP~ / ~S_DOWN~.
@@ -888,13 +1010,8 @@ To set the priority of the current headline, do ~C-c ,~, or
                              (?C . (:foreground "#68DF40"))
                              (?D . (:foreground "#11D3FF"))))
   ;;Different bullets
-  (use-package org-bullets
-    :init
-    (add-hook 'org-mode-hook #'org-bullets-mode)
-    (setq org-bullets-bullet-list '("⚫" "◆" "◉" "▶" "◇"))
-    )
   (setq org-todo-keywords
-        '((sequence "TODO(t!)" "NEXT(n!)" "DOIN(o!)" "FLUP(f!)" "|" "CXLD(c!)" "DONE(d!)"))
+        '((sequence "TODO(t!)" "NEXT(n!)" "DOIN(o!)" "WAIT(w!)" "FLUP(f!)" "|" "CXLD(c!)" "DONE(d!)"))
         org-todo-keyword-faces
         '(("TODO" . org-warning)
           ("DOIN" . (:foreground "orange"))
@@ -907,7 +1024,7 @@ To set the priority of the current headline, do ~C-c ,~, or
         )
 #+END_SRC
 
-**** Refile
+*** Refile
 
 Ref:
 https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
@@ -916,7 +1033,7 @@ https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
   (setq org-refile-targets '((org-agenda-files :maxlevel . 2)))
 #+END_SRC
 
-**** Exporting to LaTeX
+*** Exporting to LaTeX
 
 No used. TODO
 
@@ -944,7 +1061,7 @@ No used. TODO
 		   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 #+end_src
 
-*** org-present
+** org-present
 
 #+begin_src emacs-lisp
   (setq org-present-text-scale 2)
@@ -969,7 +1086,7 @@ No used. TODO
                    ))))
 #+end_src
 
-*** org-toggl
+** org-toggl
 :LOGBOOK:
 CLOCK: [2021-01-03 Sun 14:48]--[2021-01-03 Sun 14:48] =>  0:00
 :END:
@@ -990,7 +1107,7 @@ stop the timer.
 	  :init
 	  (setq toggl-auth-token "ce3e8fc3922edda6986a6e729509338f")
 	  (setq org-toggl-inherit-toggl-properties t)
-	  :load-path "/Users/chongchonghe/system-essentials/emacs/packages"
+	  :load-path "/Users/chongchonghe/dotfiles/emacs/packages"
 	  :config
 	  (toggl-get-projects)
 	  (org-toggl-integration-mode)
@@ -1003,14 +1120,53 @@ stop the timer.
 	)
 #+end_src
 
-*** org export
+** org export
 
 #+begin_src emacs-lisp :tangle yes
   ;; (use-package ox-md)
   (setq org-export-backends '(ascii html md icalendar latex odt))
 #+end_src
 
-*** org file apps
+#+begin_src emacs-lisp :tangle yes
+(defun my-org-html-postamble (plist)
+  (concat "<p>Author: Chong-Chong He</p>"
+	  (format "<p>Last updated: %s</p>" (format-time-string "%Y-%b-%d"))
+	  "<a href='https://www.astro.umd.edu/~chongchong/'>www.astro.umd.edu/~chongchong/</a>"
+	  ))
+(setq org-html-postamble 'my-org-html-postamble)
+
+;; (setq org-export-html-postamble-format 
+;; 	      '(("en" "<p class=\"author\">Author: %a (%e)</p><p class=\"date\">Last Updated %d.</p>")))
+
+;; (setq org-html-postamble-format
+;; ;; (setq org-export-html-postamble-format 
+;;       '(("en" "<p class=\"author\">Author: %a (%e)</p>
+;; Last updated: <p class=\"date\">Date: %d</p>
+;; <p class=\"creator\">Generated by %c</p>
+;; <p class=\"xhtml-validation\">%v</p>
+;; ")))
+#+end_src
+
+Remove validate
+
+#+begin_src emacs-lisp :tangle yes
+(setq org-html-validation-link nil)
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (defun my-website-html-postamble (options)
+	(concat "<hr>"
+			(if (and (plist-get options ':keywords) (not (string= (plist-get options ':keywords) "")))
+				(format "<p>Keywords: %s</p>" (plist-get options ':keywords))
+				"")
+			(format "<p class=\"date\">Modified: %s</p>" (format-time-string "%Y-%m-%d %H:%M:%S"))
+			(format "<p>Copyright (c) %s %s</p>"
+					(car (split-string (car (plist-get options ':date)) "-")) ;; TODO: get from custom document option
+					(car (plist-get options ':author)))
+			(format "<p>%s</p>" (plist-get options ':creator))))
+#+end_src
+
+** org file apps
 
 #+begin_src emacs-lisp :tangle yes
   (setq org-file-apps
@@ -1018,25 +1174,101 @@ stop the timer.
 	  ("\\.mm\\'" . default)
 	  ("\\.x?html?\\'" . default)
 	  ("\\.pdf\\'" . default)
+	  ("\\.md\\'" . default)
+	  ("\\.png\\'" . default)
 	  (auto-mode . emacs)))
 #+end_src
 
+** exec-path-from-shell
 
-** yasnippet
+#+begin_src emacs-lisp :tangle yes
+  (use-package exec-path-from-shell
+	:ensure t
+	:config
+	(when (memq window-system '(mac ns x))
+	(exec-path-from-shell-initialize)))
+#+end_src
+
+** org latex preview
+
+#+begin_src emacs-lisp :tangle yes
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+#+end_src
+
+** Publishing
+
+Ref:
+- Basic: [[https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][Publishing Org-mode files to HTML]]
+- [[https://huadeyu.tech/tools/emacs-setup-notes.html#org1f969c4][极简Emacs开发环境配置]]: org-publish
+
+Unkown
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (setq org-publish-project-alist
+        '(("org"
+           :base-directory "~/Documents/org/"
+           :publishing-directory "~/Documents/publish/"
+           :section-numbers nil
+           :table-of-contents nil
+           :publishing-function org-html-publish-to-html
+           ;; :publishing-function 'org-publish-org-to-html
+           :style "<link rel=\"stylesheet\"
+                  href=\"../style/style.css\"
+                  type=\"text/css\"/>")))
+#+END_SRC
+
+sitemap:
+
+#+begin_src emacs-lisp :tangle yes
+  (defun my-website-sitemap-function (project &optional sitemap-filename)
+	"Custom sitemap generator that inserts additional options."
+	(let ((buffer (org-publish-org-sitemap project sitemap-filename)))
+	  (with-current-buffer buffer
+		(insert "\n#+SETUPFILE: ../style/default.setup")
+		(save-buffer))))
+#+end_src
+
+
+org-plus-contrib:
+
+#+begin_src emacs-lisp :tangle yes
+  (require 'ox-extra)
+  (ox-extras-activate '(ignore-headlines))
+#+end_src
+
+** org-ref
+
+I haven't make work yet. For now, use cite:citekey to cite a paper, altough it won't reder properly in HTML output.
+
+Ref:
+- https://github.com/jkitchin/org-ref
+- Manual: https://github.com/jkitchin/org-ref/blob/master/org-ref.org
+- Quick guide: https://www.reddit.com/r/orgmode/comments/5shz5o/orgref_introduction/
+- Author guide: https://kitchingroup.cheme.cmu.edu/blog/2014/05/13/Using-org-ref-for-citations-and-references/
+
+#+begin_src emacs-lisp :tangle yes
+(setq
+ org-ref-bibliography-notes "~/Academics/org-ref-notes.org"
+ org-ref-default-bibliography '("~/folders/BIB_HE.bib")
+ org-ref-pdf-directory "~/Academics/Papers/"
+ ) 
+#+end_src
+
+* yasnippet
 
 The default snippets are located in
 =~/.emacs.d/elpa/yasnippet-0.12.2/snippets=. My own snippet files are
-located in =~/system-essentials/emacs/snippets=. To add more snippets for
+located in =~/dotfiles/emacs/snippets=. To add more snippets for
 auto-completion, add snippets files into that folder.
 
-*** Usage
+** Usage
 
 |------------------------------+-----------------------------------------|
 | =TAB=                        | hippie-expand: expand template at point |
 | =M-x yas-visit-snippet-file= | yas-expand: expand template at point    |
 | =M-/= (spacemacs only)       | Edit snippet files for current mode     |
 
-*** Available snippets
+** Available snippets
 
 | org-mode     |                                |
 |--------------+--------------------------------|
@@ -1049,23 +1281,28 @@ auto-completion, add snippets files into that folder.
 | ~plt~       | ~import matplotlib.pyplot as plt~ |
 | ~ifm~       | ~if __name__ == '__main__':~      |
 
-*** Config
+** Config
 
 #+begin_src emacs-lisp
+  (setq mode-require-final-newline nil)
+  (setq-default mode-require-final-newline nil)
+
   (use-package yasnippet
-    :diminish yas-minor-mode
-    ;; :init (yas-global-mode)
-    :ensure t
-    :config
-    (yas-global-mode 1)
-    (add-to-list #'yas-snippet-dirs "~/system-essentials/emacs/snippets")
-    (yas-reload-all)
-    ;; (progn
-    ;;   (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
-    ;;   ;; (setq yas-key-syntaxes '("w_" "w_." "^ "))
-    ;;   (setq yas-installed-snippets-dir "~/system-essentials/emacs/snippets")
-    ;;   (setq yas-expand-only-for-last-commands nil))
-    )
+					:diminish yas-minor-mode
+					;; :init (yas-global-mode)
+					:ensure t
+					:config
+					(setq yas-snippet-dirs '("~/dotfiles/emacs/snippets/yasnippet-snippets-20210105.1346/snippets" "~/dotfiles/emacs/snippets/personal"))
+					(yas-global-mode 1)
+					;; (add-to-list #'yas-snippet-dirs "~/dotfiles/emacs/snippets/yasnippet-snippets-20210105.1346/snippets")
+					;; (add-to-list #'yas-snippet-dirs "~/dotfiles/emacs/snippets/personal")
+					(yas-reload-all)
+					;; (progn
+					;;   (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+					;;   ;; (setq yas-key-syntaxes '("w_" "w_." "^ "))
+					;;   (setq yas-installed-snippets-dir "~/dotfiles/emacs/snippets")
+					;;   (setq yas-expand-only-for-last-commands nil))
+					)
 #+end_src
 
 Not used
@@ -1077,19 +1314,18 @@ Not used
                                           ;(add-to-list 'load-path "~/.emacs.d/python-docstring-mode")
                                           ;(require 'python-docstring)
                                           ;(add-hook 'python-mode-hook (lambda () (python-docstring-mode t)))
-    (yas/initialize)
-    (yas/load-directory "~/.emacs.d/snippets")
     (yas-minor-mode 1)
     ;; (defun my/autoinsert-yas-expand()
     ;;   "Replace text in yasnippet template."
     ;;   (yas/expand-snippet (buffer-string) (point-min) (point-max)))
     )
 #+end_src
-** Mail (mu4e)
+
+* Mail (mu4e)
 
 I have moved my =mail.el= here. A backup file is in =.spacemacs.d/trash-lisp=.
 
-*** Usage
+** Usage
 
 A list of mail folders:
 - All mail: archives, not going to see anymore, but keep them anyway.
@@ -1099,7 +1335,7 @@ A list of mail folders:
 - Bills
 - Drafts
 
-*** Startup config
+** Startup config
 
 Beginning of use-package: (this code block must be accompanied by a
 closing parathesis, ')', in the 'end of use-package' section.)
@@ -1141,7 +1377,7 @@ closing parathesis, ')', in the 'end of use-package' section.)
   (set-face-attribute 'mu4e-view-body-face nil :height 1.2)
 #+end_src
 
-*** Key-bindings
+** Key-bindings
 
 #+begin_src emacs-lisp :tangle yes
   (define-key mu4e-view-mode-map (kbd "j") 'next-line)
@@ -1151,7 +1387,7 @@ closing parathesis, ')', in the 'end of use-package' section.)
   (define-key mu4e-main-mode-map (kbd "U") 'mu4e-update-index)
 #+end_src
 
-*** Beautify
+** Beautify
 
 #+begin_src emacs-lisp
   (setq mu4e-headers-fields
@@ -1163,7 +1399,7 @@ closing parathesis, ')', in the 'end of use-package' section.)
           )) ;; alternatively, use :thread-subject
 #+end_src
 
-*** Managing email
+** Managing email
 
 #+BEGIN_SRC emacs-lisp
   ;; don't keep message buffers around
@@ -1203,7 +1439,7 @@ closing parathesis, ')', in the 'end of use-package' section.)
    )
 #+END_SRC
 
-*** Labels (shortcuts)
+** Labels (shortcuts)
 
 #+begin_src emacs-lisp :tangle yes
   (setq 
@@ -1224,11 +1460,9 @@ closing parathesis, ')', in the 'end of use-package' section.)
    )
 #+end_src
 
-*** send html message
+** send html message
 
-Compose message with org-mode support by enabling
-~org-mu4e-compose-org-mode~, and do ~htmlize-and-send~: ([[https://kitchingroup.cheme.cmu.edu/blog/2016/10/29/Sending-html-emails-from-org-mode-with-org-mime/][Ref-1]] and
-[[https://lists.gnu.org/archive/html/emacs-orgmode/2016-11/msg00351.html][Ref-2]])
+Compose message with org-mode support by enabling ~org-mu4e-compose-org-mode~, and do ~htmlize-and-send~: ([[https://kitchingroup.cheme.cmu.edu/blog/2016/10/29/Sending-html-emails-from-org-mode-with-org-mime/][Ref-1]] and [[https://lists.gnu.org/archive/html/emacs-orgmode/2016-11/msg00351.html][Ref-2]])
 
 #+begin_src emacs-lisp
   (defun htmlize-and-send ()
@@ -1240,7 +1474,7 @@ Compose message with org-mode support by enabling
       (message-send-and-exit)))
 #+end_src
 
-*** Auto CC self
+** Auto CC self
 
   Ref:
   https://emacs.stackexchange.com/questions/52608/how-to-add-a-value-for-cc-or-reply-to-in-each-new-message/52609
@@ -1267,7 +1501,7 @@ Compose message with org-mode support by enabling
     ;; 		 )))))
   #+END_SRC
 
-*** Making mu4e email faster
+** Making mu4e email faster
 
 Ref: https://divansantana.com/making-mu4e-faster/index.html
 # #+begin_src emacs-lisp
@@ -1276,7 +1510,7 @@ Ref: https://divansantana.com/making-mu4e-faster/index.html
 #    mu4e-index-cleanup nil)
 # #+end_src
 
-*** Send-delay (not using)
+** Send-delay (not using)
 
 **Not using**
 Allowing to schedule mails to be sent at a later time. Thus enabling
@@ -1294,7 +1528,7 @@ the ability to “undo send” mails.
   (setq mu4e-send-delay-default-delay "1m")
 #+end_src
 
-*** Header of reply
+** Header of reply
 
 Message citation with date and time:
 #+begin_src emacs-lisp
@@ -1302,7 +1536,7 @@ Message citation with date and time:
   (setq message-citation-line-format "On %a, %b %d %Y at %R, %f wrote:\n")
 #+end_src
 
-*** Notification
+** Notification
 
 #+begin_src emacs-lisp
   (setq mu4e-enable-notifications t)
@@ -1323,7 +1557,7 @@ Message citation with date and time:
   ;; (setq mu4e-alert-email-notification-types '(count))
 #+end_src
 
-*** Rich-text messages
+** Rich-text messages
 
 Not used:
 #+begin_src emacs-lisp :tangle no
@@ -1347,20 +1581,30 @@ https://stackoverflow.com/questions/28258133/how-to-view-mu4e-emacs-buffer-in-br
 (Disabled) Open long html messages in browser
 
 #+begin_src emacs-lisp :tangle no
+  ;; (setq mu4e-html2text-command "w3m -T text/html")
+
   (defun my-mu4e-html2text (msg)
-    "My html2text function; shows short message inline, show
+			"My html2text function; shows short message inline, show
   long messages in some external browser (see `browse-url-generic-program')."
-    (let ((html (or (mu4e-message-field msg :body-html) "")))
-      (if (> (length html) 20000)
-          (progn
-            (mu4e-action-view-in-browser msg)
-            "[Viewing message in external browser]")
-        (mu4e-shr2text msg))))
+			(let ((html (or (mu4e-message-field msg :body-html) "")))
+	  (if (> (length html) 20000)
+		  "Long html"
+				(mu4e-shr2text msg))))
+
+  ;; (defun my-mu4e-html2text (msg)
+  ;;       "My html2text function; shows short message inline, show
+  ;; long messages in some external browser (see `browse-url-generic-program')."
+  ;;       (let ((html (or (mu4e-message-field msg :body-html) "")))
+  ;; 	(if (> (length html) 20000)
+  ;; 		(progn
+  ;; 		      (mu4e-action-view-in-browser msg)
+  ;; 		      "[Viewing message in external browser]")
+  ;; 	      (mu4e-shr2text msg))))
 
   (setq mu4e-html2text-command 'my-mu4e-html2text)
 #+end_src
 
-*** Signatures
+** Signatures
 
 #+begin_src emacs-lisp
   ;; (setq mu4e-compose-signature
@@ -1388,7 +1632,7 @@ https://stackoverflow.com/questions/28258133/how-to-view-mu4e-emacs-buffer-in-br
             (lambda () (local-set-key (kbd "C-c C-w s") #'my-mu4e-choose-signature)))
 #+end_src
 
-*** Thread folding
+** Thread folding
 
 Functions and hot-keys to fold threads. Also make ~mu4e-headers-fold-all~ run
 after loading mu4e-header. =mu4e-thread-folding.el= is download from [[https://gist.github.com/felipeochoa/614308ac9d2c671a5830eb7847985202][this github
@@ -1400,7 +1644,7 @@ gist]], following [[https://www.reddit.com/r/emacs/comments/9dqzjq/run_a_functio
   ;;(add-hook 'mu4e-headers-found-hook 'mu4e-headers-fold-all)
 #+end_src
 
-*** Bookmarks
+** Bookmarks
 
 Ref: https://www.djcbsoftware.nl/code/mu/mu4e/Bookmarks.html
 
@@ -1411,13 +1655,13 @@ Ref: https://www.djcbsoftware.nl/code/mu/mu4e/Bookmarks.html
                          :key ?r))
 #+end_src
 
-*** end of use-package
+** end of use-package
 
 #+begin_src emacs-lisp :tangle yes
   )
 #+end_src
 
-*** mu4e-conversation
+** mu4e-conversation
 
 #+begin_src emacs-lisp :tangle yes
   (use-package mu4e-conversation
@@ -1425,7 +1669,7 @@ Ref: https://www.djcbsoftware.nl/code/mu/mu4e/Bookmarks.html
 		)
 #+end_src
 
-** helm
+* helm
 
 Before we load any helm things, need to load helm-flx so it uses flx
 instead of helm’s fuzzy matching. ([[https://github.com/dakrone/dakrone-dotfiles/blob/master/emacs.org][Ref]])
@@ -1437,285 +1681,226 @@ instead of helm’s fuzzy matching. ([[https://github.com/dakrone/dakrone-dotfil
 A good reference: https://writequit.org/org/settings.html#sec-1-34
 
 #+begin_src emacs-lisp :tangle yes
-  (use-package helm
-    ;; :bind
-    ;; (("C-M-z" . helm-resume)
-    ;;  ("C-x C-f" . helm-find-files)
-    ;;  ("C-h b" . helm-descbinds)
-    ;;  ("C-x C-r" . helm-mini)
-    ;;  ("C-x M-o" . helm-occur)
-    ;;  ("M-y" . helm-show-kill-ring)
-    ;;  ("C-h a" . helm-apropos)
-    ;;  ("C-h m" . helm-man-woman)
-    ;;  ("M-g >" . helm-ag-this-file)
-    ;;  ("M-g ," . helm-ag-pop-stack)
-    ;;  ("M-g ." . helm-do-grep)
-    ;;  ("C-x C-i" . helm-semantic-or-imenu)
-    ;;  ("M-x" . helm-M-x)
-    ;;  ("C-x C-b" . helm-buffers-list)
-    ;;  ("C-x C-r" . helm-mini)
-    ;;  ("C-x b" . helm-mini)
-    ;;  ("C-h t" . helm-world-time))
-    :init
-    (helm-mode 1)
-    :config
-    (global-set-key (kbd "M-x") #'helm-M-x)
-    ;; (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-    (global-set-key (kbd "M-C-b") #'helm-filtered-bookmarks)
-    (global-set-key (kbd "C-x C-f") #'helm-find-files)
-    ;; rebind tab to run persistent action
-    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-    ;; make TAB work in terminal
-    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
-    ;; list actions using C-z
-    (define-key helm-map (kbd "C-z")  'helm-select-action)
+(use-package helm
+  ;; :bind
+  ;; (("C-M-z" . helm-resume)
+  ;;  ("C-x C-f" . helm-find-files)
+  ;;  ("C-h b" . helm-descbinds)
+  ;;  ("C-x C-r" . helm-mini)
+  ;;  ("C-x M-o" . helm-occur)
+  ;;  ("M-y" . helm-show-kill-ring)
+  ;;  ("C-h a" . helm-apropos)
+  ;;  ("C-h m" . helm-man-woman)
+  ;;  ("M-g >" . helm-ag-this-file)
+  ;;  ("M-g ," . helm-ag-pop-stack)
+  ;;  ("M-g ." . helm-do-grep)
+  ;;  ("C-x C-i" . helm-semantic-or-imenu)
+  ;;  ("M-x" . helm-M-x)
+  ;;  ("C-x C-b" . helm-buffers-list)
+  ;;  ("C-x C-r" . helm-mini)
+  ;;  ("C-x b" . helm-mini)
+  ;;  ("C-h t" . helm-world-time))
+  :init
+  (helm-mode 1)
+  :config
+  (global-set-key (kbd "M-x") #'helm-M-x)
+  ;; (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+  ;; (global-set-key (kbd "M-C-b") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "M-C-o") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "C-x C-f") #'helm-find-files)
+  ;; rebind tab to run persistent action
+  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+  ;; make TAB work in terminal
+  (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+  ;; list actions using C-z
+  (define-key helm-map (kbd "C-z")  'helm-select-action)
   )
 #+end_src
 
-** dashboard
+* python
 
-- https://github.com/rakanalh/emacs-dashboard
-- https://emacs.stackexchange.com/questions/14282/replace-splash-screen-with-list-of-recentf
+** Basics
 
 #+begin_src emacs-lisp :tangle yes
-  (use-package dashboard
-    :ensure t
-    :diminish dashboard-mode
-    :config
-    ;; (setq dashboard-banner-logo-title "your custom text")
-    ;; (setq dashboard-startup-banner "/path/to/image")
-    (setq dashboard-items '((recents  . 10)
-                            (bookmarks . 10)))
-    (dashboard-setup-startup-hook))
+  (defun my/turn-on-elpy-mode ()
+	(interactive)
+	(elpy-mode))
+
+  (use-package python
+	:defer t
+	:mode ("\\.py\\'" . python-mode)
+	:interpreter ("python" . python-mode)
+	;; :hook hs-minor-mode
+	:bind (:map python-mode-map
+			("C-c C-c" . compile)
+			("s-e" . my/turn-on-elpy-mode)
+			)
+	:config
+	(define-key python-mode-map (kbd "C-c C-z") 'run-python)
+	(define-key python-mode-map (kbd "<backtab>") 'python-back-indent)
+	(defun my-insert-comments (string)
+	  "Insert \label{ARG} \index{\nameref{ARG}} at point"
+	  (interactive "sString for \\label and \\nameref: ")
+	  (insert "##### "  string  " #####"))
+	(define-key python-mode-map (kbd "<f5>") 'my-insert-comments)
+	(defun my-insert-comments-block (string)
+	  "Insert \label{ARG} \index{\nameref{ARG}} at point"
+	  (interactive "sString for \\label and \\nameref: ")
+	  (insert "# {{{ "  string  " 
+  # }}}"))
+	(define-key python-mode-map (kbd "<f6>") 'my-insert-comments-block)
+	)
+  (add-hook 'python-mode-hook 'hs-minor-mode)
 #+end_src
 
-** python
+#+begin_src emacs-lisp :tangle no
+  (use-package python
+			:defer t
+			:mode ("\\.py\\'" . python-mode)
+			:interpreter ("python" . python-mode)
+			:init
+			(setq-default indent-tabs-mode nil)
+			:hook hs-minor-mode
+			;; :bind (:map python-mode-map
+			;; 	      ("C-c C-c" . compile)
+			;; 	      ((kbd "<backtab>") . python-back-indent)
+			;; 	      )
+			:config
+			(setq python-indent-offset 4)
+			(elpy-enable)
+			;; (elpy-use-ipython)
+			(setq elpy-rpc-backend "jedi")
+			;; (add-hook 'elpy-mode-hook) ;;'py-autopep8-enable-on-save)
+			(setq python-shell-interpreter "ipython"
+		  python-shell-interpreter-args "--simple-prompt -i")
+			(defun my-insert-comments (string)
+	  "Insert \label{ARG} \index{\nameref{ARG}} at point"
+	  (interactive "sString for \\label and \\nameref: ")
+	  (insert "##### "  string  " #####"))
+			(define-key python-mode-map (kbd "<f5>") 'my-insert-comments)
+			)
+#+end_src
+
+** Jedi
+
+elpy include jedi???
 
 #+begin_src emacs-lisp :tangle yes
-  (use-package elpy)
+  ;; (use-package jedi
+  ;; 	      :ensure t)
+#+end_src
+
+** elpy
+
+Ref: https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a
+
+#+begin_src emacs-lisp :tangle yes
   (use-package flycheck)
+
+  (use-package elpy
+	:bind
+	(:map elpy-mode-map
+	  ("C-M-n" . elpy-nav-forward-block)
+	  ("C-M-p" . elpy-nav-backward-block))
+	:hook ((elpy-mode . flycheck-mode))
+	:init
+	(elpy-enable)
+	:config
+	(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+					  ; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
+	(setq elpy-shell-echo-output nil)
+	(setq elpy-rpc-python-command "python3")
+	(setq elpy-rpc-timeout 2)) 
+  ;; (use-package elpy
+  ;;   :ensure t
+  ;;   :commands elpy-enable
+  ;;   :init (with-eval-after-load 'python (elpy-enable))
+  ;;   )
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
+** old
+
+#+begin_src emacs-lisp :tangle no
   (with-eval-after-load 'python
-    ;; Enable elpy
-    (elpy-enable)
-    ;; (elpy-use-ipython)
-    (setq elpy-rpc-backend "jedi")
-    ;; Disable elpy Vertical Guide Lines for Indentation
-    (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
-    (when (require 'flycheck nil t)
-      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-      (add-hook 'elpy-mode-hook 'flycheck-mode))
-    ;;(require 'py-autopep8)
-    ;; (add-hook 'elpy-mode-hook) ;;'py-autopep8-enable-on-save)
-    (setq python-shell-interpreter "ipython"
-          python-shell-interpreter-args "--simple-prompt -i")
-    ;; (define-key ein:notebook-mode-map (kbd "C-c C-x d")
-    ;;   'ein:worksheet-delete-cell)
-    ;; Autoinsert Python comments
-    (global-set-key (kbd "<f5>") 'my-insert-comments)
-    (defun my-insert-comments (string)
-      "Insert \label{ARG} \index{\nameref{ARG}} at point"
-      (interactive "sString for \\label and \\nameref: ")
-      (insert "##### "  string  " #####"))
-    ;;(global-set-key (kbd "<f6>") 'my-insert-docstring)
-    ;;(defun my-insert-docstring (string)
-    ;;  "Insert \label{ARG} \index{\nameref{ARG}} at point"
-    ;;  (interactive "sString for \\label and \\nameref: ")
-    ;;  (insert '""" '  string  ' """'))
-    (add-hook 'python-mode-hook 'hs-minor-mode)
-    ;; jedi, replaced by (setq elpy-rpc-backend "jedi")
-    ;; (add-hook 'python-mode-hook 'jedi:setup)
-    ;; (setq jedi:complete-on-dot t)
-    (setq elpy-rpc-ignored-buffer-size 204800)
-    )
+	;; Disable elpy Vertical Guide Lines for Indentation
+	(add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
+	(when (require 'flycheck nil t)
+	  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+	  (add-hook 'elpy-mode-hook 'flycheck-mode))
+	;;(require 'py-autopep8)
+	;; (define-key ein:notebook-mode-map (kbd "C-c C-x d")
+	;;   'ein:worksheet-delete-cell)
+	;; Autoinsert Python comments
+	;;(global-set-key (kbd "<f6>") 'my-insert-docstring)
+	;;(defun my-insert-docstring (string)
+	;;  "Insert \label{ARG} \index{\nameref{ARG}} at point"
+	;;  (interactive "sString for \\label and \\nameref: ")
+	;;  (insert '""" '  string  ' """'))
+	;; jedi, replaced by (setq elpy-rpc-backend "jedi")
+	;; (add-hook 'python-mode-hook 'jedi:setup)
+	;; (setq jedi:complete-on-dot t)
+	(setq elpy-rpc-ignored-buffer-size 204800)
+	)
 #+end_src
 
-Auto-insert (disabled). [[https://emacs.stackexchange.com/questions/36721/evil-mode-interacting-with-python-el-invoking-skeletons][Ref]].
+Auto-insert (disabled). [[https://emacs.stackexchange.com/questions/36721/evil-mode-interacting-with-python-el-invoking-skeletons][Ref]]. Replaced by yasnippet
 
 #+begin_src emacs-lisp :tangle no
   ;; ref: https://www.webscalability.com/blog/2018/07/auto-insert-snippet-for-python-emacs/
   ;; insert python skeleton with auto-insert
-  (setq python-skeleton-autoinsert nil)
-  (eval-after-load 'autoinsert
-    '(define-auto-insert
-       '("\\.\\py\\'" . "python skeleton")
-       '(""
-         "#!/usr/bin/env python" \n
-         "\"\"\" "
-         (file-name-nondirectory (buffer-file-name)) \n \n
-         "Author: Chong-Chong He (che1234@umd.edu)" \n
-         "Written on " (format-time-string "%a, %e %b %Y.") \n
-         "\"\"\"" \n
-         \n
-         "import numpy as np" \n
-         "import matplotlib.pyplot as plt" \n
-         \n
-         > _ \n
-         \n
-         "if __name__ == '__main__':" \n
-         "pass" \n \n)))
+  ;; (setq python-skeleton-autoinsert nil)
+  ;; (eval-after-load 'autoinsert
+  ;;   '(define-auto-insert
+  ;;      '("\\.\\py\\'" . "python skeleton")
+  ;;      '(""
+  ;;        "#!/usr/bin/env python" \n
+  ;;        "\"\"\" "
+  ;;        (file-name-nondirectory (buffer-file-name)) \n \n
+  ;;        "Author: Chong-Chong He (che1234@umd.edu)" \n
+  ;;        "Written on " (format-time-string "%a, %e %b %Y.") \n
+  ;;        "\"\"\"" \n
+  ;;        \n
+  ;;        "import numpy as np" \n
+  ;;        "import matplotlib.pyplot as plt" \n
+  ;;        \n
+  ;;        > _ \n
+  ;;        \n
+  ;;        "if __name__ == '__main__':" \n
+  ;;        "pass" \n \n)))
 #+end_src
+** Snippets
 
-** Latex
-
-*** Config
-
-Beginning of use-package:
+Usage: =defg<tab>=. Ref: stackexchange, [[https://emacs.stackexchange.com/a/19471/26582][Library for automatically inserting python docstring in Google style]]
 
 #+begin_src emacs-lisp :tangle yes
-  (use-package latex
-    :defer t
-    :mode ("\\.tex\\'" . latex-mode)
-    :bind
-    (:map LaTeX-mode-map
-          ("M-n" . outline-next-heading)
-          ("M-p" . outline-previous-heading))
-    :config
+  (defun python-args-to-google-docstring (text &optional make-fields)
+	"Return a reST docstring format for the python arguments in yas-text."
+	(let* ((indent (concat "\n" (make-string (current-column) 32)))
+		   (args (python-split-args text))
+	   (nr 0)
+		   (formatted-args
+		(mapconcat
+		 (lambda (x)
+		   (concat "    " (nth 0 x)
+			   (if make-fields (format ": ${%d:arg%d}" (cl-incf nr) nr))
+			   (if (nth 1 x) (concat " \(default " (nth 1 x) "\)"))))
+		 args
+		 indent)))
+	  (unless (string= formatted-args "")
+		(concat
+		 (mapconcat 'identity
+			(list "" "Args:" formatted-args)
+			indent)
+		 "\n"))))
 #+end_src
 
+** Anaconda-mode
 
 #+begin_src emacs-lisp :tangle yes
-  (setq TeX-auto-save t)
-  (add-hook 'LaTeX-mode-hook #'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook #'no-auto-fill)
-  (add-hook 'LaTeX-mode-hook 'hs-minor-mode)
-  (add-hook 'LaTeX-mode-hook 'outline-minor-mode)
-  (setq TeX-PDF-mode t)	      ;; Compile documents to PDF by default
-  (setq-default TeX-master nil) ;; Make emacs aware of multi-file projects
-  ;; CDLaTeX
-  (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)   ; with AUCTeX LaTeX mode
-  ;; (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)   ; with Emacs latex mode
-  (autoload 'helm-bibtex "helm-bibtex" "" t)
-  (electric-pair-mode)
-  (add-hook 'LaTeX-mode-hook
-            '(lambda ()
-               (define-key LaTeX-mode-map (kbd "$") 'self-insert-command)
-               ))
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-  ;; (setq reftex-plug-into-auctex t)
-  (setq reftex-plug-into-AUCTeX t)
-  (evil-define-key 'normal outline-minor-mode-map (kbd "SPC") 'evil-toggle-fold)
+  (use-package anaconda-mode)
 #+end_src
 
-compile
-
-#+begin_src emacs-lisp :tangle yes
-  ;; (evil-define-key 'normal LaTeX-mode-map (kbd ", l") 'TeX-command-master)
-  ;; do not query the user before saving each file with TeX-save-document
-  (setq TeX-save-query nil) 
-  (evil-define-key 'normal LaTeX-mode-map (kbd ", l") 'TeX-command-run-all)
-  (evil-define-key 'normal LaTeX-mode-map (kbd ", v") 'TeX-view)
-  (evil-define-key 'normal LaTeX-mode-map (kbd "M-w") 'LaTeX-fill-region)
-#+end_src
-
-sync
-
-#+begin_src emacs-lisp :tangle yes
-  ;; Enable the clicking feature of the sync
-  (add-hook 'LaTeX-mode-hook
-            (lambda () (local-set-key (kbd "<S-s-mouse-1>") #'TeX-view))
-            )
-  (setq TeX-PDF-mode t)	      ;; Compile documents to PDF by default
-  ;; Use Skim as viewer, enable source <-> PDF sync
-  ;; make latexmk available via C-c C-c
-  ;; Note: SyncTeX is setup via ~/.latexmkrc (see below)
-  (add-hook 'LaTeX-mode-hook (lambda ()
-                               (push
-                                '("latexmk" "latexmk -pdf %s" TeX-run-TeX nil t :help "Run latexmk on file")
-                                TeX-command-list)))
-  (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "latexmk")))
-  ;; use Skim as default pdf viewer
-  ;; Skim's displayline is used for forward search (from .tex to .pdf)
-  ;; option -b highlights the current line; option -g opens Skim in the background
-  (setq TeX-view-program-selection '((output-pdf "PDF Viewer")))
-  (setq TeX-view-program-list
-        '(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
-#+end_src
-
-Auto-raise Emacs on activation: https://sourceforge.net/p/skim-app/wiki/TeX_and_PDF_Synchronization/
-
-#+begin_src emacs-lisp :tangle yes
-  (defun raise-emacs-on-aqua()
-    (shell-command "osascript -e 'tell application \"Emacs\" to activate' &"))
-  (add-hook 'server-switch-hook 'raise-emacs-on-aqua)
-#+end_src
-
-
-Other untested config
-
-#+begin_src emacs-lisp :tangle no
-  ;; AucTeX
-  ;; (setq reftex-default-bibliography '("~/Dropbox/Bib_bibdesk.bib") )
-  ;; (setq helm-bibtex-bibliography '("~/Dropbox/Bib_bibdesk.bib") )
-  ;; (setq reftex-default-bibliography '("/Users/chongchonghe/Documents/bib_tmp.bib"))
-  ;; (setq helm-bibtex-bibliography '("/Users/chongchonghe/Documents/bib_tmp.bib"))
-
-  ;; ;; (setq TeX-command-force "XeLaTeX")
-  ;; (setq TeX-command-force "latexmk")
-
-  (setq TeX-parse-self t)
-
-  (setq TeX-save-query nil)
-
-  (add-hook 'LaTeX-mode-hook
-            (lambda()
-              (local-set-key [C-tab] 'TeX-complete-symbol)))
-
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-
-  (require 'smartparens-config)
-  (add-hook 'LaTex-mode-hook #'smartparens-mode)
-
-  ;; keybindings
-  ;; (define-key outline-mode-map [M-left] 'outline-hide-body)
-  ;; (define-key outline-mode-map [M-right] 'outline-show-all)
-  ;; (define-key outline-mode-map [M-up] 'outline-previous-heading)
-  ;; (define-key outline-mode-map [M-down] 'outline-next-heading)
-  ;; (define-key outline-mode-map [C-M-left] 'outline-hide-sublevels)
-  ;; (define-key outline-mode-map [C-M-right] 'outline-show-children)
-  ;; (define-key outline-mode-map [C-M-up] 'outline-previous-visible-heading)
-  ;; (define-key outline-mode-map [C-M-down] 'outline-next-visible-heading)
-
-  (defun turn-on-outline-minor-mode () (outline-minor-mode 1))
-  (add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
-  (add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
-
-  (defun turn-on-flycheck-mode () (flycheck-mode 1))
-  (add-hook 'LaTeX-mode-hook 'turn-on-flycheck-mode)
-  (add-hook 'LaTeX-mode-hook 'turn-on-flycheck-mode)
-
-  (global-set-key [M-left] 'outline-hide-body)
-  (global-set-key [M-right] 'outline-show-all)
-  (global-set-key [M-up] 'outline-previous-heading)
-  (global-set-key [M-down] 'outline-next-heading)
-  (global-set-key [C-M-left] 'outline-hide-sublevels)
-  (global-set-key [C-M-right] 'outline-show-children)
-  (global-set-key [C-M-up] 'outline-previous-visible-heading)
-  (global-set-key [C-M-down] 'outline-next-visible-heading)
-
-#+end_src
-
-Avoid pop-up of *Async Shell Command* buffer in Emacs when syncing from PDF to emacs.
-Ref: https://stackoverflow.com/questions/13901955/how-to-avoid-pop-up-of-async-shell-command-buffer-in-emacs
-
-#+begin_src emacs-lisp :tangle yes
-  (add-to-list
-   'display-buffer-alist
-   (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
-  ;; not working
-  (call-process-shell-command "osascript&" nil 0)
-#+end_src
-
-
-End of use-package
-#+begin_src emacs-lisp :tangle yes
-  )
-#+end_src
-
-
-** Markdown
+* Markdown
 
 Use tab as indent:
 
@@ -1726,9 +1911,144 @@ Use tab as indent:
              (setq tab-width 4)))
 #+end_src
 
-** Other packages
+* Latex
 
-*** windresize
+** Basics
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package latex
+	:defer t
+	:ensure auctex
+	:mode ("\\.tex\\'" . LaTeX-mode)
+	:bind
+	(:map LaTeX-mode-map
+	  ("M-n" . outline-next-heading)
+	  ("M-p" . outline-previous-heading)
+	  ("C-c C-c" . TeX-command-run-all)
+	  ("C-c l" . TeX-error-overview)
+	  ;; ("C-tab" . TeX-complete-symbol) 
+	  ("C-c w" . juanjo:textcount))
+
+	:config
+	(setq TeX-auto-save t)
+	(setq TeX-auto-save t)
+	(setq TeX-PDF-mode t)	      ;; Compile documents to PDF by default
+	(setq TeX-parse-self t)
+	(setq TeX-save-query nil)
+	;; (setq-default TeX-master nil) ;; Make emacs aware of multi-file projects
+	(add-hook 'LaTeX-mode-hook #'visual-line-mode)
+	(add-hook 'LaTeX-mode-hook #'no-auto-fill)
+	(add-hook 'LaTeX-mode-hook 'hs-minor-mode)
+	(add-hook 'LaTeX-mode-hook 'outline-minor-mode)
+	(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+	(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+	(evil-define-key 'normal outline-minor-mode-map (kbd "SPC") 'evil-toggle-fold)
+	;; CDLaTeX
+	(add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)   ; with AUCTeX LaTeX mode
+	;; (setq reftex-plug-into-auctex t)
+	(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+	(setq reftex-plug-into-AUCTeX t)
+	(autoload 'helm-bibtex "helm-bibtex" "" t)
+	(electric-pair-mode)
+	;; compile
+	;; (evil-define-key 'normal LaTeX-mode-map (kbd ", l") 'TeX-command-master)
+	;; do not query the user before saving each file with TeX-save-document
+	(setq TeX-save-query nil) 
+	(evil-define-key 'normal LaTeX-mode-map (kbd ", l") 'TeX-command-run-all)
+	(evil-define-key 'normal LaTeX-mode-map (kbd ", v") 'TeX-view)
+	(evil-define-key 'normal LaTeX-mode-map (kbd "M-w") 'LaTeX-fill-region)
+	;; sync
+	;; Enable the clicking feature of the sync
+	(add-hook 'LaTeX-mode-hook
+		  (lambda () (local-set-key (kbd "<S-s-mouse-1>") #'TeX-view))
+		  )
+	(setq TeX-PDF-mode t)	      ;; Compile documents to PDF by default
+	;; Use Skim as viewer, enable source <-> PDF sync
+	;; make latexmk available via C-c C-c
+	;; Note: SyncTeX is setup via ~/.latexmkrc (see below)
+	(add-hook 'LaTeX-mode-hook (lambda ()
+					 (push
+				  '("latexmk" "latexmk -pdf %s" TeX-run-TeX nil t :help "Run latexmk on file")
+				  TeX-command-list)))
+	(add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "latexmk")))
+	;; use Skim as default pdf viewer
+	;; Skim's displayline is used for forward search (from .tex to .pdf)
+	;; option -b highlights the current line; option -g opens Skim in the background
+	(setq TeX-view-program-selection '((output-pdf "PDF Viewer")))
+	(setq TeX-view-program-list
+	  '(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
+
+	;; keybindings
+	;; (define-key outline-mode-map [M-left] 'outline-hide-body)
+	;; (define-key outline-mode-map [M-right] 'outline-show-all)
+	;; (define-key outline-mode-map [M-up] 'outline-previous-heading)
+	;; (define-key outline-mode-map [M-down] 'outline-next-heading)
+	;; (define-key outline-mode-map [C-M-left] 'outline-hide-sublevels)
+	;; (define-key outline-mode-map [C-M-right] 'outline-show-children)
+	;; (define-key outline-mode-map [C-M-up] 'outline-previous-visible-heading)
+	;; (define-key outline-mode-map [C-M-down] 'outline-next-visible-heading)
+
+	(defun turn-on-outline-minor-mode () (outline-minor-mode 1))
+	(add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
+	(add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
+	(defun turn-on-flycheck-mode () (flycheck-mode 1))
+	(add-hook 'LaTeX-mode-hook 'turn-on-flycheck-mode)
+	)
+#+end_src
+
+Set preview options
+#+begin_src emacs-lisp :tangle yes
+  (setq org-preview-latex-default-process 'dvisvgm)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  ;; not used
+
+  (global-set-key [M-left] 'outline-hide-body)
+  (global-set-key [M-right] 'outline-show-all)
+  (global-set-key [M-up] 'outline-previous-heading)
+  (global-set-key [M-down] 'outline-next-heading)
+  (global-set-key [C-M-left] 'outline-hide-sublevels)
+  (global-set-key [C-M-right] 'outline-show-children)
+  (global-set-key [C-M-up] 'outline-previous-visible-heading)
+  (global-set-key [C-M-down] 'outline-next-visible-heading)
+
+  ;; AucTeX
+  (setq reftex-default-bibliography '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib") )
+  (setq helm-bibtex-bibliography '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib") )
+  (setq reftex-default-bibliography '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib"))
+  (setq helm-bibtex-bibliography '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib"))
+
+
+  (add-hook 'LaTeX-mode-hook
+				'(lambda ()
+		   (define-key LaTeX-mode-map (kbd "$") 'self-insert-command)
+		   ))
+
+
+  (require 'smartparens-config)
+  (add-hook 'LaTex-mode-hook #'smartparens-mode)
+#+end_src
+
+** citation
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package reftex)
+  (setq reftex-default-bibliography
+			'("/Users/chongchonghe/Academics/Bib/BIB_HE.bib"))
+  ;; (setq reftex-default-bibliography
+  ;; 	      '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib",
+  ;; 	"/Users/chongchonghe/Academics/Bib/Books.bib",
+  ;; 	"/Users/chongchonghe/Academics/Bib/Bib_HE_PhD.bib"))
+
+  (setq reftex-external-file-finders
+  '(("tex" . "/path/to/kpsewhich -format=.tex %f")
+	("bib" . "/path/to/kpsewhich -format=.bib %f")))
+#+end_src
+
+* Other packages
+
+** windresize
 
 #+begin_src emacs-lisp :tangle yes
   (use-package windresize
@@ -1738,9 +2058,9 @@ Use tab as indent:
 		)
 #+end_src
 
-** General config, ending
+* Keybindings
 
-*** Make swithing windows easier
+** Make swithing windows easier
 
 #+begin_src emacs-lisp
   ;; ;; make swithing windows easier
@@ -1760,12 +2080,45 @@ Use tab as indent:
   (define-key evil-normal-state-map (kbd "M-l") #'evil-window-right)
 #+end_src
 
-*** Other key-bindinds
+#+begin_src emacs-lisp :tangle yes
+  (use-package transpose-frame)
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key (kbd "<f12>") 'next-buffer)
+  (global-set-key (kbd "<f11>") 'previous-buffer)
+#+end_src
+
+** super keys
+
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key (kbd "s-v") 'clipboard-yank)
+  (global-set-key (kbd "s-k") 'kill-current-buffer)
+  (global-set-key (kbd "s-e") 'eval-region)
+  (global-set-key (kbd "s-b") 'eval-buffer)
+  (global-set-key (kbd "s-c") 'compile)
+  (global-set-key (kbd "s-r") 'recompile)
+  (global-set-key (kbd "s-,") 'previous-buffer)
+  (global-set-key (kbd "s-.") 'next-buffer)
+  (global-set-key (kbd "s-j") 'jump-to-register)
+#+end_src
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "M-v") 'evil-paste-after)
+  ;; (global-set-key (kbd "M-v") 'evil-paste-after)
 #+end_src
-** Smooth scroll
+
+** Clipboard
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key (kbd "M-v") 'clipboard-yank)
+#+end_src
+
+** Adjust window size
+
+#+begin_src emacs-lisp :tangle yes
+(fset 'my/shrink (kbd "C-u 39 C-x {"))
+#+end_src
+
+* Smooth scroll
 
 #+begin_src emacs-lisp :tangle yes
   ;; (use-package smooth-scroll
@@ -1773,12 +2126,14 @@ Use tab as indent:
   ;;       (smooth-scroll-mode 1)
   ;;       (setq smooth-scroll/vscroll-step-size 5)
   ;;       )
-  (use-package smooth-scrolling
-		:config
-		(smooth-scrolling-mode 1))
+  ;; (use-package smooth-scrolling
+  ;; 	      :config
+  ;; 	      (smooth-scrolling-mode 1))
 #+end_src
 
-** tramp
+* tramp
+
+Make tramp faster:
 
 #+begin_src emacs-lisp :tangle yes
   (setq remote-file-name-inhibit-cache nil)
@@ -1788,4 +2143,150 @@ Use tab as indent:
 					  tramp-file-name-regexp))
   (setq tramp-verbose 1)
 #+end_src
+
+* hide-show
+
+#+begin_src emacs-lisp :tangle yes
+  (add-hook 'hs-minor-mode-hook
+		(lambda ()
+		  ;;(local-set-key (kbd "C-c p") 'hs-toggle-hiding)
+		  ;; (local-set-key (kbd "SPC") 'hs-toggle-hiding)
+		  (local-set-key (kbd "C-c h") 'hs-hide-all)
+		  (local-set-key (kbd "C-c s") 'hs-show-all)
+		  (local-set-key (kbd "C-c l") 'hs-hide-level)))
+  (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+  (evil-define-key 'normal hs-minor-mode-map (kbd "SPC") 'hs-toggle-hiding)
+
+  ;; (add-hook 'hs-minor-mode-hook 'my-hideshow-config)
+  ;; (defun my-hideshow-config ()
+  ;;       "For use in 'hs-minor-mode-hook'."
+  ;;       ;;(local-set-key (kbd "C-c p") 'hs-toggle-hiding)
+  ;;       ;; (local-set-key (kbd "SPC") 'hs-toggle-hiding)
+  ;;       (local-set-key (kbd "C-c h") 'hs-hide-all)
+  ;;       (local-set-key (kbd "C-c s") 'hs-show-all)
+  ;;       (local-set-key (kbd "C-c l") 'hs-hide-level)
+  ;;       )
+  ;; (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+  ;; (evil-define-key 'normal hs-minor-mode-map (kbd "SPC") 'hs-toggle-hiding)
+#+end_src
+
+* Some Automatics
+
+** Initial my tasks.org view
+
+Not working...
+
+#+begin_src emacs-lisp :tangle yes
+  (defun taskinit ()
+		(interactive)
+		(split-window-right)
+		((kbd "C-u 10 C-x {"))
+		(set-frame-height (selected-frame) 60)
+		)
+
+#+end_src
+
+* dashboard
+
+- https://github.com/rakanalh/emacs-dashboard
+- https://emacs.stackexchange.com/questions/14282/replace-splash-screen-with-list-of-recentf
+
+#+begin_src emacs-lisp :tangle yes
+(use-package dashboard
+  :ensure t
+  :diminish dashboard-mode
+  :config
+  ;; (setq dashboard-banner-logo-title "your custom text")
+  ;; (setq dashboard-startup-banner "/path/to/image")
+  (setq dashboard-items '((recents  . 10)
+                          (bookmarks . 10)))
+  ;; (dashboard-setup-startup-hook)
+  )
+#+end_src
+
+* Folding mode
+
+** Usage
+
+Folding block are defined as =# {{{= and =# }}}= pairs (in python mode). Use the snippet '#{<tab>' to quick insert. Use <F9> to toggle folding.
+
+Source: https://www.emacswiki.org/emacs/FoldingMode#toc6
+
+** Config
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package folding
+	:ensure t
+	:load-path "/Users/chongchonghe/dotfiles/emacs/packages/project-emacs--folding-mode/folding.el"
+	:config
+	(folding-mode-add-find-file-hook)
+	(add-hook 'folding-mode
+		  (lambda () (local-set-key [f9] 'folding-toggle-show-hide)))
+	)
+#+end_src
+
+* f.el
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package helm-org)
+  (use-package f)
+#+end_src
+
+* layout-restore.el
+
+Old and causing problem. Not using.
+
+Ref: https://www.emacswiki.org/emacs/layout-restore.el
+
+#+begin_src emacs-lisp :tangle no
+;; (use-package layout-restore
+;;   :defer nil
+;;   :load-path "~/dotfiles/emacs/packages/layout-restore.el"
+;;   :config
+;;   (global-set-key (kbd "C-c l") 'layout-save-current)
+;;   (global-set-key (kbd "C-c r") 'layout-restore)
+;;   (global-set-key (kbd "C-c d") 'layout-delete-current)
+;;   )
+
+;; (require 'layout-restore)
+;; (global-set-key (kbd "C-c l") 'layout-save-current)
+;; (global-set-key (kbd "C-c r") 'layout-restore)
+;; (global-set-key (kbd "C-c d") 'layout-delete-current)
+#+end_src
+
+* Startup
+
+#+begin_src emacs-lisp :tangle yes
+;; (defun my-shrink ()
+;;   (interactive)
+;;   ;; (funcall (key-binding (kbd "C-u 39 C-x {")))
+;;   ;; (call-interactively (key-binding (kbd "C-u 39 C-x {")))
+;;   ;; (/ (loop repeat 39 collect (key-binding (kbd "C-u 39 C-x {"))))
+;;   ;; (/ (loop repeat n sum (funcall f arg)) n)
+;;   ;; (cl-loop repeat 39 (shrink-window-horizontally))
+;;   ;; (r 39 'shrink-window-horizontally 'nil')
+;;   'shrink-window-horizontally
+;;   'shrink-window-horizontally
+;;   'shrink-window-horizontally
+;;   'shrink-window-horizontally
+;;   )
+
+;; Saving Emacs Sessions
+;; (desktop-save-mode 1)
+
+;; (fset 'my-shrink (kbd "C-u 43 C-x {"))
+(defun my-shrink ()
+  (interactive)
+  (shrink-window-horizontally 43))
+(defun my-todo ()
+  (interactive)
+  (find-file "~/Dropbox/orgfiles/tasks.org")
+  (delete-other-windows)
+  (split-window-right)
+  (my-shrink)
+  )
+(my-todo)
+#+end_src
+
+* Custom variables
 
