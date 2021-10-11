@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-#name : my latex template snippet (MNRAS)
-#key : mnras_
+#name : template - MNRAS
+#key : mnras
 #contributor : Chong-Chong He
 # --
 % LaTeX template for creating an MNRAS paper

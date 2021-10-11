@@ -4,5 +4,5 @@
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
 # --
 #+BEGIN_SRC sh
-  $0
+$0
 #+END_SRC

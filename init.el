@@ -77,6 +77,8 @@
   (setq column-number-mode t)
   (setq x-select-enable-clipboard t)
   ;; (desktop-save-mode 1)
+  ;; end file with new line ("\n")
+  (setq mode-require-final-newline t)
 
   ;; Use cmd key for meta
   ;; https://superuser.com/questions/297259/set-emacs-meta-key-to-be-the-mac-key
@@ -117,50 +119,8 @@
     (setq word-wrap t)
     )
 
-  (defun my/theme-light ()
-		(interactive)
-		(load-theme 'doom-one-light t))
-  (defun my/theme-dark ()
-	(interactive)
-		(load-theme 'doom-one t))
-
-  (use-package doom-themes
-		:config
-		;; Global settings (defaults)
-		(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-	  doom-themes-enable-italic t) ; if nil, italics is universally disabled
-		(load-theme 'doom-one t)
-		;; (load-theme 'doom-one-light t)
-		)
-
-  ;; Default font
-  (set-face-attribute 'default nil :font "Monaco-15")
-
-  ;; mixed-pitch, https://gitlab.com/jabranham/mixed-pitch
-  (use-package mixed-pitch
-	:hook
-	;; If you want it in all text modes:
-	(text-mode . mixed-pitch-mode)
-	:config
-	(set-face-attribute 'variable-pitch nil :family "Helvetica Neue" :height 1.2)
-	(set-face-attribute 'fixed-pitch nil :family "Monaco" :height 1.0)
-	;; bigger text for org-mode headings
-	(custom-theme-set-faces
-	 'user
-	 `(org-level-4 ((t (:inherit outline-4 :height 1.0))))
-	 `(org-level-3 ((t (:inherit outline-3 :height 1.1))))
-	 `(org-level-2 ((t (:inherit outline-2 :height 1.2))))
-	 `(org-level-1 ((t (:inherit outline-1 :height 1.3))))
-	 `(org-document-title ((t (:family "Helvetica Neue" :height 2.0 :underline nil))))
-	 )
-	)
-
-  (when window-system (set-frame-size (selected-frame) 130 50))
-
-  (dolist (charset '(kana han symbol cjk-misc bopomofo))
-    (set-fontset-font (frame-parameter nil 'font)
-                      charset (font-spec :family "PingFang SC"
-                                         :size 15)))
+(use-package default-text-scale
+  :defer 2)
 
   ;; (add-to-list 'load-path "~/.emacs.d/evil")
   ;; (require 'evil)
@@ -199,7 +159,7 @@
   ;; Make horizontal movement cross lines
   (setq-default evil-cross-lines t)
   (setq key-chord-two-keys-delay 0.4)
-  (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+  ;; (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
   ;; (define-key evil-insert-state-map (kbd "M-v") 'yank)
 
   ;; (use-package evil-collection
@@ -208,18 +168,25 @@
   ;;   :config
   ;;   (evil-collection-init))
 
-  ;; For python
-  (add-hook 'python-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
-  ;; For Javascript
-  (add-hook 'js2-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
-  ;; ;; For ruby
-  ;; (add-hook 'ruby-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+;; For python
+(add-hook 'python-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+;; julia
+(add-hook 'julia-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+;; For Javascript
+(add-hook 'js2-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+;; ;; For ruby
+;; (add-hook 'ruby-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 
-  (require 'org)
-  (setq org-image-actual-width nil)
-  (setq org-hide-emphasis-markers t)
-  ;; startup: showeverything
-  (setq org-startup-folded nil)
+(require 'org)
+;; inline image size
+;; (setq org-image-actual-width nil)
+(setq org-image-actual-width 500)
+(setq org-hide-emphasis-markers t)
+;; startup: showeverything
+(setq org-startup-folded nil)
+
+(use-package htmlize
+  :load-path "/Users/chongchonghe/dotfiles/emacs/packages/emacs-htmlize/htmlize.el")
 
   (defun org-toggle-hide-emphasis-markers ()
     "Toggle org-hide-emphasis-markers"
@@ -238,14 +205,19 @@
 
   (setq outline-blank-line 2)
 
-  (defun org-show-two-levels ()
-		(interactive)
-		(org-content 2))
-  (with-eval-after-load 'org
-		(define-key org-mode-map (kbd "C-c 2") 'org-show-two-levels))
-  ;; Evaluate it after startup
-  ;; (add-hook 'org-mode-hook #'org-show-two-levels)
-  (add-hook 'org-view-mode-hook '(text-scale-adjust))
+(defun org-show-two-levels ()
+  (interactive)
+  (org-content 2))
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c 2") 'org-show-two-levels))
+(defun org-show-three-levels ()
+  (interactive)
+  (org-content 3))
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c 3") 'org-show-three-levels))
+;; Evaluate it after startup
+;; (add-hook 'org-mode-hook #'org-show-two-levels)
+(add-hook 'org-view-mode-hook '(text-scale-adjust))
 
   ;; (use-package org-cliplink
   ;;   :bind ("C-c C-p" . 'org-cliplink))
@@ -254,16 +226,10 @@
 
   ;; (setq org-modules '(org-tempo))
 
-  (use-package org-autolist
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
-    )
-
-(setq org-image-actual-width 500)
-
-  (bind-key "C-c c" 'org-capture)
-  (bind-key "C-c a" 'org-agenda)
-  (bind-key "C-c t" 'org-todo)
+;; (use-package org-autolist
+;;   :config
+;;   (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
+;;   )
 
   (defun my-org-mode-config ()
 		(local-set-key "\M-n" 'outline-next-visible-heading)
@@ -309,18 +275,35 @@
             (set-visited-file-name new-name)
             (set-buffer-modified-p nil))))))
 
-  ;; evil key-bindings
-  ;; (define-key org-agenda-mode-map "j" 'evil-next-line)
-  ;; (define-key org-agenda-mode-map "k" 'evil-previous-line)
+(use-package evil-org
+  :ensure t
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config
+  (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys)
+  (setq org-super-agenda-header-map (make-sparse-keymap))
+  )
 
-  (use-package evil-org
-	:ensure t
-	:after org
-	:hook (org-mode . (lambda () evil-org-mode))
-	:config
-	(evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))
-	(require 'evil-org-agenda)
-	(evil-org-agenda-set-keys))
+;; 'evil-org-agenda is replaced by the following
+;; (define-key org-agenda-mode-map "j" 'evil-next-line)
+;; (define-key org-agenda-mode-map "k" 'evil-previous-line)
+
+;; (use-package org-agenda
+;;   :bind (:map org-agenda-mode-map
+;; 	      ("j" . org-agenda-next-item)
+;; 	      ("k" . org-agenda-previous-time)))
+
+;; (use-package org-agenda
+;;   :config
+;;   (define-key org-agenda-mode-map (kbd "j") #'org-agenda-next-item)
+;;   (define-key org-agenda-mode-map (kbd "k") #'org-agenda-previous-item))
+
+;; (use-package org-evil
+;;   :ensure t
+;;   :after org
+;;   )
 
   ;; (font-lock-add-keywords
   ;;  'org-mode
@@ -439,22 +422,23 @@
 
   ;; (require 'org-mu4e)
 
-  ;; (require 'ess-site)
-  (setq  inferior-julia-program-name "/Applications/Julia-1.4.app/Contents/Resources/julia/bin/julia")
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((C . t)
-     ;; (julia . t)
-     (shell . t)
-     (python . t)
-     (abc . t)))
+;; (require 'ess-site)
+(setq  inferior-julia-program-name "/Applications/Julia-1.5.app/Contents/Resources/julia/bin/julia")
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((C . t)
+   (julia . t)
+   (shell . t)
+   (python . t)
+   (ipython . t)
+   (abc . t)))
 
-  (setq
-   org-export-babel-evaluate nil
-   org-confirm-python-evaluate nil
-   org-confirm-babel-evaluate nil
-   org-confirm-C++-evaluate nil
-   )
+(setq
+ org-export-babel-evaluate nil
+ org-confirm-python-evaluate nil
+ org-confirm-babel-evaluate nil
+ org-confirm-C++-evaluate nil
+ )
 
   (defvar org-babel-eval-verbose t
     "A non-nil value makes `org-babel-eval' display")
@@ -482,22 +466,28 @@
 
 (setq org-src-preserve-indentation t)
 
-  (evil-define-key 'normal org-mode-map (kbd "t") 'org-todo)
-  (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo-list)
-  (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo-list)
-  (define-key evil-normal-state-map (kbd "C-a") 'org-agenda-list)
+(use-package ob-async)
 
-  (with-eval-after-load 'org
-					;; (setq org-directory "/Users/chongchonghe/Dropbox/orgfiles")
-					(setq org-agenda-files '("~/Dropbox/orgfiles/todos.org"
-								 "~/Dropbox/orgfiles/notes.org"
-								 "~/Dropbox/orgfiles/tasks"))
-					;; (setq org-agenda-files
-					;; 	"~/Dropbox/orgfiles/agenda.org")
-					(setq org-default-notes-file "~/Dropbox/orgfiles/todos.org")
-					(setq org-agenda-confirm-kill t)
-					;;open agenda in current window
-					(setq org-agenda-window-setup (quote current-window)))
+(use-package ob-ipython)
+
+(evil-define-key 'normal org-mode-map (kbd "t") 'org-todo)
+(evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo-list)
+(evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo-list)
+(define-key evil-normal-state-map (kbd "C-a") 'org-agenda)
+(setq org-directory "~/Dropbox/orgfiles")
+
+(with-eval-after-load 'org
+  ;; (setq org-directory "/Users/chongchonghe/Dropbox/orgfiles")
+  ;; (setq org-agenda-files '("~/Dropbox/orgfiles/todos.org"
+  ;; 			   "~/Dropbox/orgfiles/notes.org"
+  ;; 			   "~/Dropbox/orgfiles/tasks"))
+  (setq org-agenda-files '("~/Dropbox/orgfiles"))
+  ;; (setq org-agenda-files
+  ;; 	"~/Dropbox/orgfiles/agenda.org")
+  (setq org-default-notes-file "~/Dropbox/orgfiles/work.org")
+  (setq org-agenda-confirm-kill t)
+  ;;open agenda in current window
+  (setq org-agenda-window-setup (quote current-window)))
 
   (setq org-agenda-span 14
 	org-agenda-start-on-weekday nil
@@ -516,46 +506,82 @@
   ;;     (push (org-projectile-project-todo-entry) org-capture-templates))
   ;;   :ensure t)
 
-  (with-eval-after-load 'org
-    (setq org-capture-templates
-          '(("t" "Todo" entry (file+headline "" "Tasks")
-             "* TODO [#A] %?\n %U\n\n" :empty-lines-before 1)
-            ("a" "Todo with link" entry (file+headline "" "Tasks")
-             "* TODO [#A] %?\n  %U\n  %a\n\n" :empty-lines-before 1 :empty-lines-after 1)
-            ("n" "Notes" entry (file+headline "~/Dropbox/orgfiles/notes.org" "Notes")
-             "* %?\n  %U\n\n" :empty-lines-before 1)
-            ("i" "Ideas" entry (file+headline "~/Dropbox/orgfiles/notes.org" "Ideas")
-             "* %?\n  %u\n\n" :empty-lines-before 1)
-            ("f" "Followup" entry (file+headline "" "Followup")
-             "* FLUP [#B] %?\n  %U\n  %a\n\n" :empty-lines-before 1)
-            ("l" "Later" entry (file+headline "" "Later (emails or tasks)")
-             "* TODO [#D] %?\n  %U\n  %a\n\n" :empty-lines-before 1)
-            ;; ("g" "General todo" entry (file+headline "/Users/chongchonghe/tasks.org" "Tasks")
-            ;;  "* TODO [#B] %?\n %a" :empty-lines 1)
-            )
-          ))
+(setq org-default-priority ?A)
+(setq org-highest-priority ?A)
+(setq org-lowest-priority ?D)
+;;set colours for priorities
+(setq org-priority-faces '((?A . (:foreground "#FF0000" :weight bold))
+			   (?B . (:foreground "#FF9815" :weight bold))
+			   (?C . (:foreground "#68DF40"))
+			   (?D . (:foreground "#11D3FF"))))
+;;Different bullets
+(setq org-todo-keywords
+      '((sequence "TODO(t!)" "NEXT(n!)" "DOIN(o!)" "WAIT(w!)" "FLUP(f!)" "REFI(r!)" "|" "SCHE(s!)" "CXLD(c!)" "DONE(d!)"))
+      org-todo-keyword-faces
+      '(("TODO" . org-warning)
+	("DOIN" . (:foreground "yellow"))
+	("FLUP" . (:foreground "magenta"))
+	("REFI" . (:foreground "#A52A2A"))
+	;; ("CANCELLED" . (:foreground "white" :background "#4d4d4d" :weight bold))
+	("CXLD" . (:foreground "gray"))
+	("NEXT" . "#008080")
+	("DONE" . "#333"))
+      org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-deadline-if-done t
+      )
 
-  (setq org-default-priority ?A)
-  (setq org-highest-priority ?A)
-  (setq org-lowest-priority ?D)
-  ;;set colours for priorities
-  (setq org-priority-faces '((?A . (:foreground "#FF0000" :weight bold))
-                             (?B . (:foreground "#FF9815" :weight bold))
-                             (?C . (:foreground "#68DF40"))
-                             (?D . (:foreground "#11D3FF"))))
-  ;;Different bullets
-  (setq org-todo-keywords
-        '((sequence "TODO(t!)" "NEXT(n!)" "DOIN(o!)" "WAIT(w!)" "FLUP(f!)" "|" "CXLD(c!)" "DONE(d!)"))
-        org-todo-keyword-faces
-        '(("TODO" . org-warning)
-          ("DOIN" . (:foreground "orange"))
-          ("FLUP" . (:foreground "magenta"))
-          ;; ("CANCELLED" . (:foreground "white" :background "#4d4d4d" :weight bold))
-          ("CXLD" . (:foreground "gray"))
-          ("NEXT" . "#008080"))
-        org-agenda-skip-scheduled-if-done t
-        org-agenda-skip-deadline-if-done t
-        )
+(defun my-org-set-dark-todo-faces ()
+  (setq org-todo-keyword-faces
+	'(("TODO" . org-warning)
+	  ("DOIN" . (:foreground "yellow"))
+	  ("FLUP" . (:foreground "magenta"))
+	  ("REFI" . (:foreground "#A52A2A"))
+	  ;; ("CANCELLED" . (:foreground "white" :background "#4d4d4d" :weight bold))
+	  ("CXLD" . (:foreground "gray"))
+	  ("NEXT" . "#008080")
+	  ("DONE" . "#333"))))
+
+(defun my-org-set-light-todo-faces ()
+  (setq org-todo-keyword-faces
+	'(("TODO" . org-warning)
+	  ("DOIN" . (:foreground "red"))
+	  ("FLUP" . (:foreground "magenta"))
+	  ("REFI" . (:foreground "#A52A2A"))
+	  ;; ("CANCELLED" . (:foreground "white" :background "#4d4d4d" :weight bold))
+	  ("CXLD" . (:foreground "gray"))
+	  ("NEXT" . "#008080")
+	  ("DONE" . "#333"))))
+
+(with-eval-after-load 'org
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "" "Todos")
+           "* TODO [#%^{Priority?||A|B|C|D}] %?\n %u\n\n\n" :empty-lines-before 1)
+          ("o" "Doing" entry (file+headline "" "Todos")
+           "* DOIN [#%^{Priority?||A|B|C|D}] %?\n %u\n\n" :empty-lines-before 1)
+          ("a" "Todo with link" entry (file+headline "" "Todos")
+           "* TODO [#A] %?\n  %U\n  %a\n\n" :empty-lines-before 1)
+          ("n" "Notes" entry (file+headline "" "General Notes")
+           "* REFI %? :NOTE:\n%U\n\n" :empty-lines-before 1)
+          ("m" "Meeting" entry (file+headline "" "Meetings")
+           "* Meeting with %? :MEETING:\n%U\n\n" :empty-lines-before 1)
+          ("i" "Ideas" entry (file+headline "" "Ideas")
+           "* %?\n  %u\n\n" :empty-lines-before 1)
+          ("s" "Scheduled" entry (file+headline "" "Todos")
+           "* [#A] %^{Title}\nSCHEDULED: %^t\n%u\n%?\n\n" :empty-lines-before 1)
+          ("e" "Event" entry (file+headline "" "Todos")
+           "* %^{This is a?||TODO |NEXT |FLUP |DOIN |SCHE |REFI}%^{Title}\nSCHEDULED: %^t\n%t\n%?")
+          ("f" "Followup" entry (file+headline "" "Followups")
+           "* FLUP [#B] %?\n  %U\n  %a\n\n" :empty-lines-before 1)
+          ("l" "Life" entry (file+headline "~/Dropbox/orgfiles/life.org" "Todos")
+           "* TODO [#C] %?\n  %U\n  %a\n\n" :empty-lines-before 1)
+          ("j" "Journal" entry (file+headline "~/Dropbox/orgfiles/journals.org" "2021")
+           "** %? \n\n" :empty-lines-before 1)
+          ;; ("w" "Work" entry (file+headline "" "Work")
+          ;;  "* DOIN [#A] %? :WORK:\n%U\n\n" :empty-lines-before 1)
+          ;; ("g" "General todo" entry (file+headline "/Users/chongchonghe/tasks.org" "Todos")
+          ;;  "* TODO [#B] %?\n %a" :empty-lines 1)
+          )
+        ))
 
   (setq org-refile-targets '((org-agenda-files :maxlevel . 2)))
 
@@ -580,22 +606,55 @@
                    ;;(toggle-frame-fullscreen)
                    ))))
 
-  (with-eval-after-load 'org
-	(use-package org-toggl
-	  :init
-	  (setq toggl-auth-token "ce3e8fc3922edda6986a6e729509338f")
-	  (setq org-toggl-inherit-toggl-properties t)
-	  :load-path "/Users/chongchonghe/dotfiles/emacs/packages"
-	  :config
-	  (toggl-get-projects)
-	  (org-toggl-integration-mode)
-	  ;; remove clock-out since it failed at stopping toggl timer
-	  (remove-hook 'org-clock-out-hook #'org-toggl-clock-out)
-	  ;; bind C-c i to clock-in then clock-out
-	  (define-key org-mode-map (kbd "C-c i")
-		(lambda () (interactive) (org-clock-in) (sit-for 2) (org-clock-out)))
-	  )
-	)
+;; (with-eval-after-load 'org
+;;   (use-package org-toggl
+;;     :init
+;;     (setq toggl-auth-token "ce3e8fc3922edda6986a6e729509338f")
+;;     (setq org-toggl-inherit-toggl-properties t)
+;;     :load-path "/Users/chongchonghe/dotfiles/emacs/packages"
+;;     :config
+;;     (toggl-get-projects)
+;;     (org-toggl-integration-mode)
+;;     ;; remove clock-out since it failed at stopping toggl timer
+;;     (remove-hook 'org-clock-out-hook #'org-toggl-clock-out)
+;;     ;; bind C-c i to clock-in then clock-out
+;;     (define-key org-mode-map (kbd "C-c i")
+;;       (lambda () (interactive) (org-clock-in) (sit-for 2) (org-clock-out)))
+;;     )
+;;   )
+
+(use-package org-toggl
+  :after org
+  :defer 3
+  :init
+  (setq toggl-auth-token "ce3e8fc3922edda6986a6e729509338f")
+  (setq org-toggl-inherit-toggl-properties t)
+  :load-path "/Users/chongchonghe/dotfiles/emacs/packages"
+  :config
+  (toggl-get-projects)
+  (org-toggl-integration-mode)
+  ;; remove clock-out since it failed at stopping toggl timer
+  (remove-hook 'org-clock-out-hook #'org-toggl-clock-out)
+  ;; bind C-c i to clock-in then clock-out
+  (define-key org-mode-map (kbd "C-c i")
+    (lambda () (interactive) (org-clock-in) (sit-for 2) (org-clock-out))))
+
+  (setq org-file-apps
+		'(("\\.docx\\'" . default)
+	  ("\\.mm\\'" . default)
+	  ("\\.x?html?\\'" . default)
+	  ("\\.pdf\\'" . default)
+	  ("\\.md\\'" . default)
+	  ("\\.png\\'" . default)
+	  (auto-mode . emacs)))
+
+  (use-package exec-path-from-shell
+	:ensure t
+	:config
+	(when (memq window-system '(mac ns x))
+	(exec-path-from-shell-initialize)))
+
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
   ;; (use-package ox-md)
   (setq org-export-backends '(ascii html md icalendar latex odt))
@@ -631,29 +690,65 @@
 					(car (plist-get options ':author)))
 			(format "<p>%s</p>" (plist-get options ':creator))))
 
-  (setq org-file-apps
-		'(("\\.docx\\'" . default)
-	  ("\\.mm\\'" . default)
-	  ("\\.x?html?\\'" . default)
-	  ("\\.pdf\\'" . default)
-	  ("\\.md\\'" . default)
-	  ("\\.png\\'" . default)
-	  (auto-mode . emacs)))
+(require 'ox-publish)
 
-  (use-package exec-path-from-shell
-	:ensure t
-	:config
-	(when (memq window-system '(mac ns x))
-	(exec-path-from-shell-initialize)))
+(global-hl-line-mode 1)
+(setq org-src-fontify-natively t)  
+(add-to-list 'load-path "/Users/chongchonghe/dotfiles/emacs/packages/emacs-htmlize")
+(require 'htmlize)
 
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+;; (setq org-html-postamble nil)
+(setq org-html-postamble
+      (concat "<p>Author: %a</p>"
+              "<p>%d</p>"
+              "<p><a href='https://www.astro.umd.edu/~chongchong/'>"
+              "www.astro.umd.edu/~chongchong/</a></p>"))
 
-  (defun my-website-sitemap-function (project &optional sitemap-filename)
-	"Custom sitemap generator that inserts additional options."
-	(let ((buffer (org-publish-org-sitemap project sitemap-filename)))
-	  (with-current-buffer buffer
-		(insert "\n#+SETUPFILE: ../style/default.setup")
-		(save-buffer))))
+;; sitemap function
+(defun @-org-publish-org-sitemap (title list)
+  "Sitemap generation function."
+  (concat (format "#+TITLE: %s\n" title)
+          "\n#+SETUPFILE: ../style/default.setup\n"
+          "#+OPTIONS: toc:nil\n"
+          (org-list-to-subtree list)
+          "\n"
+          ))
+
+(setq org-publish-project-alist
+      '(("body"
+         ;; generic
+         :base-directory "."
+         :base-extension "org"
+         :publishing-directory "../public"
+         :recursive t
+         :language en
+         ;; html
+         :publishing-function org-html-publish-to-html
+         ;; sitemap
+         :auto-sitemap t
+         :sitemap-filename "index.org"
+         :sitemap-title "Index"
+         ;; :sitemap-sort-files anti-chronologically
+         ;; :sitemap-file-entry-format "%d - %t"
+         ;; :sitemap-function my-website-sitemap-function
+         ;; :sitemap-function org-publish-org-sitemap
+         :sitemap-function @-org-publish-org-sitemap
+         ;; :html-home/up-format "<div> <a accesskey='h' href='index.html'> UP </a> | <a accesskey='H' href='index.html'> HOME </a> </div>"
+         )
+        ("css"
+         :base-directory "../style/"
+         :base-extension "css\\|js"
+         :publishing-directory "../public/css"
+         :publishing-function org-publish-attachment
+         :recursive t)
+        ("attach"
+         :base-directory "attach/"
+         ;; :base-extension "png\\|jpg\\|ico"
+         :base-extension "png\\|jpg\\|ico\\|svg"
+         :publishing-directory "../public/attach"
+         :publishing-function org-publish-attachment
+         :recursive t)
+        ("all" :components ("body" "css" "attach"))))
 
   (require 'ox-extra)
   (ox-extras-activate '(ignore-headlines))
@@ -664,7 +759,34 @@
  org-ref-pdf-directory "~/Academics/Papers/"
  )
 
-  (setq mode-require-final-newline nil)
+(use-package plain-org-wiki
+  :ensure t
+  :load-path "/Users/chongchonghe/dotfiles/emacs/packages/plain-org-wiki/"
+  :config
+  (setq plain-org-wiki-directory "~/org/wiki/org")
+  (setq plain-org-academic-directory "~/org/astronomy/org")
+  (setq plain-org-wiki-extra-dirs '("~/org/astronomy/org"))
+  (global-set-key (kbd "C-M-w") 'plain-org-wiki))
+
+(org-add-link-type "message"
+ (lambda (id)
+  (shell-command
+   ;; (concat "open -a mail.app message:" id))))
+   (concat "open message:" id))))
+
+(use-package org-super-agenda
+  :defer 2
+  :config
+  (org-super-agenda-mode)
+  )
+
+(setq org-super-agenda-groups
+       '((:auto-category t)))
+
+;; (let ((org-super-agenda-groups
+;;        '((:auto-category t))))
+;;   (org-agenda-list))
+
   (setq-default mode-require-final-newline nil)
 
   (use-package yasnippet
@@ -913,60 +1035,63 @@
   (define-key helm-map (kbd "C-z")  'helm-select-action)
   )
 
-  (defun my/turn-on-elpy-mode ()
-	(interactive)
-	(elpy-mode))
+(defun my/turn-on-elpy-mode ()
+  (interactive)
+  (elpy-mode))
 
-  (use-package python
-	:defer t
-	:mode ("\\.py\\'" . python-mode)
-	:interpreter ("python" . python-mode)
-	;; :hook hs-minor-mode
-	:bind (:map python-mode-map
-			("C-c C-c" . compile)
-			("s-e" . my/turn-on-elpy-mode)
-			)
-	:config
-	(define-key python-mode-map (kbd "C-c C-z") 'run-python)
-	(define-key python-mode-map (kbd "<backtab>") 'python-back-indent)
-	(defun my-insert-comments (string)
-	  "Insert \label{ARG} \index{\nameref{ARG}} at point"
-	  (interactive "sString for \\label and \\nameref: ")
-	  (insert "##### "  string  " #####"))
-	(define-key python-mode-map (kbd "<f5>") 'my-insert-comments)
-	(defun my-insert-comments-block (string)
-	  "Insert \label{ARG} \index{\nameref{ARG}} at point"
-	  (interactive "sString for \\label and \\nameref: ")
-	  (insert "# {{{ "  string  " 
+(use-package python
+  :defer t
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python" . python-mode)
+  ;; :hook hs-minor-mode
+  :bind (:map python-mode-map
+	      ("C-c C-c" . compile)
+	      ("s-e" . my/turn-on-elpy-mode)
+	      )
+  :config
+  (setq python-shell-interpreter "/Users/chongchonghe/anaconda3/bin/python3")
+  (define-key python-mode-map (kbd "C-c C-z") 'run-python)
+  (define-key python-mode-map (kbd "<backtab>") 'python-back-indent)
+  (setq python-python-command "/Users/chongchonghe/anaconda3/bin/python")
+  (defun my-insert-comments (string)
+    "Insert \label{ARG} \index{\nameref{ARG}} at point"
+    (interactive "sString for \\label and \\nameref: ")
+    (insert "##### "  string  " #####"))
+  (define-key python-mode-map (kbd "<f5>") 'my-insert-comments)
+  (defun my-insert-comments-block (string)
+    "Insert \label{ARG} \index{\nameref{ARG}} at point"
+    (interactive "sString for \\label and \\nameref: ")
+    (insert "# {{{ "  string  " 
   # }}}"))
-	(define-key python-mode-map (kbd "<f6>") 'my-insert-comments-block)
-	)
-  (add-hook 'python-mode-hook 'hs-minor-mode)
+  (define-key python-mode-map (kbd "<f6>") 'my-insert-comments-block)
+  )
+(add-hook 'python-mode-hook 'hs-minor-mode)
 
   ;; (use-package jedi
   ;; 	      :ensure t)
 
-  (use-package flycheck)
+(use-package flycheck)
 
-  (use-package elpy
-	:bind
-	(:map elpy-mode-map
-	  ("C-M-n" . elpy-nav-forward-block)
-	  ("C-M-p" . elpy-nav-backward-block))
-	:hook ((elpy-mode . flycheck-mode))
-	:init
-	(elpy-enable)
-	:config
-	(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-					  ; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
-	(setq elpy-shell-echo-output nil)
-	(setq elpy-rpc-python-command "python3")
-	(setq elpy-rpc-timeout 2)) 
-  ;; (use-package elpy
-  ;;   :ensure t
-  ;;   :commands elpy-enable
-  ;;   :init (with-eval-after-load 'python (elpy-enable))
-  ;;   )
+(use-package elpy
+  :bind
+  (:map elpy-mode-map
+	("C-M-n" . elpy-nav-forward-block)
+	("C-M-p" . elpy-nav-backward-block))
+  :hook ((elpy-mode . flycheck-mode))
+  :init
+  (elpy-enable)
+  :config
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+					; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
+  (setq elpy-shell-echo-output nil)
+  (setq elpy-rpc-python-command "python3")
+  (setq elpy-rpc-timeout 30)		; elpy autopep8 call timeout
+  ) 
+;; (use-package elpy
+;;   :ensure t
+;;   :commands elpy-enable
+;;   :init (with-eval-after-load 'python (elpy-enable))
+;;   )
 
   (defun python-args-to-google-docstring (text &optional make-fields)
 	"Return a reST docstring format for the python arguments in yas-text."
@@ -989,6 +1114,8 @@
 		 "\n"))))
 
   (use-package anaconda-mode)
+
+(use-package julia-mode)
 
   (add-hook 'text-mode-hook
           '(lambda ()
@@ -1073,8 +1200,6 @@
 	(defun turn-on-flycheck-mode () (flycheck-mode 1))
 	(add-hook 'LaTeX-mode-hook 'turn-on-flycheck-mode)
 	)
-
-  (setq org-preview-latex-default-process 'dvisvgm)
 
   (use-package reftex)
   (setq reftex-default-bibliography
@@ -1199,6 +1324,93 @@
   (use-package helm-org)
   (use-package f)
 
+(use-package neotree
+  :config
+  (defun my-neotree-mode-config ()
+    "For use in 'neotree-mode-hook'."
+    ;; (local-set-key (kbd "j") 'neotree-next-line)
+    ;; (local-set-key (kbd "k") 'neotree-previous-line)
+    (local-set-key (kbd "C-j") 'neotree-change-root)
+    (local-set-key (kbd "C-k") 'neotree-select-up-node)
+    (local-set-key (kbd "<return>") 'neotree-enter)
+    ;; (with-eval-after-load 'neotree
+    ;;   (define-key neotree-mode-map (kbd "<return>") 'neotree-enter))
+    (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+    (define-key evil-normal-state-local-map (kbd "g") 'neotree-refresh)
+    (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
+    (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)
+    )
+  (add-hook 'neotree-mode-hook 'my-neotree-mode-config))
+
+(add-hook 'neotree-mode-hook
+	  (lambda () (define-key evil-motion-state-local-map (kbd "g") 'neotree-refresh)))
+
+;; (use-package matlab-mode)
+
+(defun my-light-theme ()
+  (interactive)
+  (load-theme 'doom-one-light t)
+  (set-background-color "#e6e3df")
+  (my-org-set-light-todo-faces)
+  )
+(defun my-dark-theme ()
+  (interactive)
+  (load-theme 'doom-one t)
+  (my-org-set-dark-todo-faces)
+  )
+
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  ;; (load-theme 'doom-one t)
+  ;; (load-theme 'doom-one-light t)
+  (my-light-theme)
+  )
+
+  ;; Default font
+  (set-face-attribute 'default nil :font "Monaco-16")
+
+  ;; mixed-pitch, https://gitlab.com/jabranham/mixed-pitch
+  (use-package mixed-pitch
+	:hook
+	;; If you want it in all text modes:
+	(text-mode . mixed-pitch-mode)
+	:config
+	(set-face-attribute 'variable-pitch nil :family "Helvetica Neue" :height 1.2)
+	(set-face-attribute 'fixed-pitch nil :family "Monaco" :height 1.0)
+	;; bigger text for org-mode headings
+	(custom-theme-set-faces
+	 'user
+	 `(org-level-4 ((t (:inherit outline-4 :height 1.0))))
+	 `(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+	 `(org-level-2 ((t (:inherit outline-2 :height 1.2))))
+	 `(org-level-1 ((t (:inherit outline-1 :height 1.3))))
+	 `(org-document-title ((t (:family "Helvetica Neue" :height 2.0 :underline nil))))
+	 )
+	)
+
+  (when window-system (set-frame-size (selected-frame) 130 50))
+
+  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font)
+                      charset (font-spec :family "PingFang SC"
+                                         :size 15)))
+
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c a") 'org-agenda)
+;; (global-set-key (kbd "C-c a") 'org-agenda-list)
+;; (define-key yas-minor-mode-map (kbd "C-c t") nil)
+;; (global-set-key (kbd "C-c t") 'org-todo-list)
+;; ;; (bind-key* "C-c t" 'org-todo-list)
+;; (global-set-key (kbd "<f9>") 'org-todo-list)
+
+;; (with-eval-after-load 'org
+;;   (define-key org-agenda-mode-map (kbd "j") #'org-agenda-next-item)
+;;   (define-key org-agenda-mode-map (kbd "k") #'org-agenda-previous-item))
+
 ;; (defun my-shrink ()
 ;;   (interactive)
 ;;   ;; (funcall (key-binding (kbd "C-u 39 C-x {")))
@@ -1227,4 +1439,4 @@
   (split-window-right)
   (my-shrink)
   )
-(my-todo)
+;; (my-todo)
