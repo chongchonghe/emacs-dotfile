@@ -1,0 +1,189 @@
+#+title: ChongChong He's Emacs Configuration File
+#+AUTHOR: Chong-Chong He
+#+PROPERTY: header-args :tangle yes :results silent
+#+STARTUP: content
+#+SETUPFILE: /Users/chongchonghe/org/utils/org_export/theme-readtheorg.setup
+#+OPTIONS: H:3 toc:3 num:3
+
+* About
+
+This is my Emacs configuration file written in Org mode. It is an attempt to keep my =~/.emacs.d/init.el= file organized and readable, as Emacs configuration could be a life-long practice.
+
+The general structure of this org-file is inspired by [[https://github.com/larstvei/dot-emacs/blob/master/init.org][this github repository]].
+
+** If you want to use this dotfile
+
+- Make a backup of your own =~/.emacs.d/=
+- Copy =init.org= and =init.el.tangle= to =~/.emacs.d/= and rename =init.el.tangle= to =init.el=
+- Open your Emacs
+
+** How to update this dotfile
+
+- Edit this file.
+- Execute =C-c C-v t= to exported everything in blocks that start with ~#+BEGIN_SRC emacs-lisp~ and end with ~#+END_SRC~ to init.el.
+
+** Editing tips
+
+  - Use =C-c '= to edit a code block in an individual buffer in an individual buffer.
+  - =lisp<tab>= to insert a ~#+BEGIN_SRC emacs-lisp~ ~#+END_SRC~ block.
+
+** Resources
+
+Here is a list of resources where I learned to configure Emacs
+
+*** Articles
+
+- [[https://caiorss.github.io/Emacs-Elisp-Programming/Elisp_Programming.html#sec-1][Elisp Programming]]
+
+- [[https://medium.com/@holzman.simon/emacs-on-macos-catalina-10-15-in-2019-79ff713c1ccc][Emacs on MacOS Catalina 10.15 in 2̶0̶1̶9̶ 2020]]
+
+- [[https://blog.d46.us/advanced-emacs-startup/][Advanced Techniques for Reducing Emacs Startup Time]]
+
+- Syncing Custom Set Variables: https://assortedarray.com/posts/my-init-org-setup/
+
+*** Dot Emacs files
+
+- https://github.com/yanghaoxie/emacs-dotfile
+- [[https://akirakyle.com/dotfile/dotfile.html#org83b9c8b][One Dotfile to rule them all!]]
+- dakrone-dotfiles: https://github.com/dakrone/dakrone-dotfiles/blob/master/emacs.org
+- Juan José García Ripoll: http://juanjose.garciaripoll.com/blog/my-emacs-windows-configuration/index.html
+- [[https://huadeyu.tech/tools/emacs-setup-notes.html][极简Emacs开发环境配置]]
+
+** TODO
+
+- what is ERC?
+- [[http://ergoemacs.org/emacs/elisp_next_prev_user_buffer.html][Emacs: Next/Previous User Buffer]]
+
+** Start to use this configuration
+
+When this configuration is loaded for the first time, the init.el is the file that is loaded. It should look like this:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; This file replaces itself with the actual configuration at first run.
+
+  ;; We can't tangle without org!
+  (require 'org)
+  ;; Open the configuration
+  (find-file (concat user-emacs-directory "init.org"))
+  ;; tangle it
+  (org-babel-tangle)
+  ;; load it
+  (load-file (concat user-emacs-directory "init.el"))
+  ;; finally byte-compile it
+  (byte-compile-file (concat user-emacs-directory "init.el"))
+#+END_SRC
+
+It tangles the org-file, so that this file is overwritten with the actual configuration. Afterwards, this is not needed, because we can use =C-c C-v t= to run =org-babel-tangle=, which does the same job.
+
+Alternatively, we can add the following configuration to execute =org-babel-tangle= after changes. I prefer to not enable this and do it manually.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  ;; -*- mode: emacs-lisp -*-
+
+  ;; (defun tangle-init ()
+  ;;       "If the current buffer is 'init.org' the code-blocks are
+  ;; tangled, and the tangled file is compiled."
+  ;;       (when (equal (buffer-file-name)
+  ;; 			       ;; (expand-file-name (concat user-emacs-directory "init.org")))
+  ;; 			       "/Users/chongchonghe/dotfiles/emacs/init.org")
+  ;; 	;; Avoid running hooks when tangling.
+  ;; 	(let ((prog-mode-hook nil))
+  ;; 	      (org-babel-tangle)
+  ;; 	      (byte-compile-file (concat user-emacs-directory "init.el")))))
+  ;; (add-hook 'after-save-hook 'tangle-init)
+#+END_SRC
+
+(Not in use) The following config is a common optimization to temporarily disable garbage collection during initialization.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; -*- mode: emacs-lisp -*-
+
+  (lexical-let ((old-gc-treshold gc-cons-threshold))
+    (setq gc-cons-threshold most-positive-fixnum)
+    (add-hook 'after-init-hook
+              (lambda () (setq gc-cons-threshold old-gc-treshold))))
+#+END_SRC
+
+** Dot emacs debugging
+
+- Remember to delete init.elc as you update init.el
+- ~Debugger entered--Lisp error: (void-variable personal-keybindings)~
+  - ~(use-package org)~
+
+* Basic usage
+
+- Bookmarks :: Commands: ~bookmark-set~, ~helm-bookmarks~
+- org-agenda :: Shortcuts: =C-c c=: org-capture, =C-c a t=: org-todo, =C-c a a=: org-agenda
+
+* Emacs initialization
+
+** Initialization
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; Make startup faster by reducing the frequency of garbage
+  ;; collection.  The default is 800 kilobytes.  Measured in bytes.
+  (setq gc-cons-threshold 100000000)
+
+  (package-initialize)
+  (add-to-list 'load-path "~/.emacs.d/pkgs")
+
+  ;; (defvar myPackages
+  ;;   '(better-defaults
+  ;;     ;;ein
+  ;;     elpy
+  ;;     flycheck
+  ;;     ;;spolky   ; theme?
+  ;;     ;; py-autopep8
+  ;;     ))
+#+END_SRC
+
+** Add package sources
+
+#+BEGIN_SRC emacs-lisp
+(unless (assoc-default "melpa" package-archives)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+(unless (assoc-default "org" package-archives)
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
+#+END_SRC
+
+Use =M-x package-refresh-contents= to reload the list of packages after adding these for the first time.
+
+** Use-package
+
+*** Usage
+
+To use local packages, use ~:ensure nil~, or use ~:load-path~ keyword. e.g.
+
+#+begin_src emacs-lisp :tangle no
+  (use-package si-general
+    :ensure nil
+    :load-path "~/.emacs.d/lib/si-general.el")
+#+end_src
+
+*** Config
+
+#+BEGIN_SRC emacs-lisp
+  ;; This is only needed once, near the top of the file
+  (require 'bind-key)
+  (eval-when-compile
+    ;; Following line is not needed if use-package.el is in ~/.emacs.d
+    (add-to-list 'load-path "~/.emacs.d/elpa")
+    (require 'use-package))
+
+  ;; (add-to-list 'load-path "~/.emacs.d/elpa")
+  ;; (require 'use-package)
+
+  ;; (unless (package-installed-p 'use-package)
+  ;;   (package-refresh-contents)
+  ;;   (package-install 'use-package))
+
+  (setq use-package-always-ensure t)
+  (setq use-package-verbose t)
+
+  ;; (use-package ein)
+  ;; (use-package ein-notebook)
+  ;; (use-package ein-subpackages)
+  ;; (use-package better-defaults)
+#+END_SRC
+

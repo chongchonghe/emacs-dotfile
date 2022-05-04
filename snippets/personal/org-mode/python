@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: ipythonhaha
-# key: py
-# --
-#+begin_src python :results output pp :exports both
-$0
-#+end_src

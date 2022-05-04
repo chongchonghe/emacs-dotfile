@@ -1,8 +1,0 @@
-# -*- mode: snippet -*-
-# name: python
-# key: python
-# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
-# --
-#+BEGIN_SRC python
-$0
-#+END_SRC

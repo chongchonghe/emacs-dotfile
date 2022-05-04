@@ -30,8 +30,8 @@
 
 (unless (assoc-default "melpa" package-archives)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
-;; (unless (assoc-default "org" package-archives)
-;;   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
+(unless (assoc-default "org" package-archives)
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
 
   ;; This is only needed once, near the top of the file
   (require 'bind-key)
@@ -81,19 +81,6 @@
 (setq mode-require-final-newline t)
 ;; always follow symlinks
 (setq find-file-visit-truename t)
-;; always confirm with y or n, not yes or no.
-;; https://www.emacswiki.org/emacs/YesOrNoP
-(defalias 'yes-or-no-p 'y-or-n-p)
-
-;; Use cmd key for meta
-;; https://superuser.com/questions/297259/set-emacs-meta-key-to-be-the-mac-key
-;; (setq mac-option-key-is-meta nil
-;;       mac-command-key-is-meta t
-;;       mac-command-modifier 'meta
-;;       mac-option-modifier 'super)
-;; (setq mac-option-modifier 'super)
-(setq mac-option-modifier 'meta)
-(setq mac-command-modifier 'super)
 
 (defun my/reload-emacs-configuration ()
   (interactive)
@@ -119,18 +106,16 @@
   (prefer-coding-system 'utf-8)
 
 (setq compile-command "make ")
-;; (global-set-key (kbd "C-c r") #'recompile)
+(global-set-key (kbd "C-c r") #'recompile)
 
-; from enberg on #emacs
-(add-hook 'compilation-finish-functions
-  (lambda (buf str)
-    (if (null (string-match ".*exited abnormally.*" str))
-        ;;no errors, make the compilation window go away in a few seconds
-        (progn
-          (run-at-time
-           "2 sec" nil 'delete-windows-on
-           (get-buffer-create "*compilation*"))
-          (message "No Compilation Errors!")))))
+(setq special-display-buffer-names
+      '("*compilation*"))
+
+(setq special-display-function
+      (lambda (buffer &optional args)
+        (split-window)
+        (switch-to-buffer buffer)
+        (get-buffer-window buffer 0)))
 
   (defun no-auto-fill ()
     "Turn off auto-fill-mode."
@@ -229,8 +214,6 @@
   (setq key-chord-two-keys-delay 0.4)
   ;; (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
   ;; (define-key evil-insert-state-map (kbd "M-v") 'yank)
-  (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
-  (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
 
   ;; (use-package evil-collection
   ;;   :after evil
@@ -247,30 +230,26 @@
 ;; ;; For ruby
 ;; (add-hook 'ruby-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 
-;; (use-package org
-;;   :pin gnu)
-(require 'org)
-(setq org-image-actual-width (list 300))
-(setq org-hide-emphasis-markers t)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(use-package org
+  :pin gnu)
+;; (require 'org)
 ;; inline image size
 ;; (setq org-image-actual-width nil)
-(setq org-blank-before-new-entry
-      '((heading . t) (plain-list-item . nil)))
+(setq org-image-actual-width (list 500))
+(setq org-hide-emphasis-markers t)
+;; startup: showeverything
+(setq org-startup-folded nil)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
 
 (use-package htmlize
-  :defer 10
   :load-path "/Users/chongchonghe/dotfiles/emacs/packages/emacs-htmlize")
 
-;; startup: showeverything
-(setq org-startup-folded t)
-
-(defun org-toggle-hide-emphasis-markers ()
-  "Toggle org-hide-emphasis-markers"
-  (interactive)
-  (if org-hide-emphasis-markers
-      (setq org-hide-emphasis-markers nil)
-    (setq org-hide-emphasis-markers t)))
+  (defun org-toggle-hide-emphasis-markers ()
+    "Toggle org-hide-emphasis-markers"
+    (interactive)
+    (if org-hide-emphasis-markers
+        (setq org-hide-emphasis-markers nil)
+      (setq org-hide-emphasis-markers t)))
 
   ;; (setq org-descriptive-links nil)
 
@@ -296,11 +275,10 @@
 ;; (add-hook 'org-mode-hook #'org-show-two-levels)
 (add-hook 'org-view-mode-hook '(text-scale-adjust))
 
-(use-package org-cliplink
-  :defer 6
-  :bind ("C-c C-p" . 'org-cliplink))
-;; (require 'org-cliplink)
-;; (define-key org-mode-map (kbd "C-c C-p") 'org-cliplink)
+  ;; (use-package org-cliplink
+  ;;   :bind ("C-c C-p" . 'org-cliplink))
+  (require 'org-cliplink)
+  (define-key org-mode-map (kbd "C-c C-p") 'org-cliplink)
 
   ;; (setq org-modules '(org-tempo))
 
@@ -308,8 +286,6 @@
 ;;   :config
 ;;   (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
 ;;   )
-
-(setq org-return-follows-link t)
 
   (defun my-org-mode-config ()
 		(local-set-key "\M-n" 'outline-next-visible-heading)
@@ -330,7 +306,7 @@
 		(local-set-key "\M-h" 'org-metaleft)
 		(local-set-key "\M-l" 'org-metaright)
 		(local-set-key "\C-ce" 'org-html-export-to-html)
-		;; (local-set-key (kbd "s-p") (kbd "C-c C-e h h"))
+		(local-set-key (kbd "s-p") (kbd "C-c C-e h h"))
 		(setq-local truncate-lines 'nil)
 		;; (org-indent-mode)  ;; not working?
 		)
@@ -394,35 +370,35 @@
   ;;  '(("^ *\\([-]\\) "
   ;;     (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-;; (use-package org-bullets
-;;       :init
-;;       (add-hook 'org-mode-hook #'org-bullets-mode)
-;;       (setq org-bullets-bullet-list '("⚫" "◆" "◉" "▶" "◇"))
-;;       )
-(setq-default org-list-indent-offset 4)
-(use-package org-superstar              ; supersedes `org-bullets'
-  :ensure
-  :after org
-  :config
-  ;; Every non-TODO headline now have no bullet
-  (setq org-superstar-headline-bullets-list '("\u200b"))
-  (setq org-superstar-leading-bullet "\u200b")
-  (setq org-superstar-item-bullet-alist
-	'((?+ . ?+)
-	  (?* . ?➤)
-	  (?- . ?•)))
-  ;; Enable custom bullets for TODO items
-  (setq org-superstar-special-todo-items t)
-  (setq org-superstar-todo-bullet-alist
-	'(("TODO" "☐")
-	  ("NEXT" "✒")
-	  ("HOLD" "✰")
-	  ("WAIT" "☕")
-	  ("CXLD" "✘")
-	  ("DONE" "✔")))
-  (org-superstar-restart))
-;; (setq org-ellipsis "⤵")
-;; (setq org-ellipsis "▼")
+  ;; (use-package org-bullets
+  ;;       :init
+  ;;       (add-hook 'org-mode-hook #'org-bullets-mode)
+  ;;       (setq org-bullets-bullet-list '("⚫" "◆" "◉" "▶" "◇"))
+  ;;       )
+  (setq-default org-list-indent-offset 4)
+  (use-package org-superstar              ; supersedes `org-bullets'
+				:ensure
+				:after org
+				:config
+				;; Every non-TODO headline now have no bullet
+				(setq org-superstar-headline-bullets-list '("\u200b"))
+				(setq org-superstar-leading-bullet "\u200b")
+				(setq org-superstar-item-bullet-alist
+	  '((?+ . ?+)
+					(?* . ?➤)
+					(?- . ?•)))
+				;; Enable custom bullets for TODO items
+				(setq org-superstar-special-todo-items t)
+				(setq org-superstar-todo-bullet-alist
+	  '(("TODO" "☐")
+					("NEXT" "✒")
+					("HOLD" "✰")
+					("WAIT" "☕")
+					("CXLD" "✘")
+					("DONE" "✔")))
+				(org-superstar-restart))
+  ;; (setq org-ellipsis "⤵")
+  ;; (setq org-ellipsis "▼")
 
   ;; simple version, only change font size
   ;; (custom-set-faces
@@ -571,53 +547,18 @@
 			   "~/Dropbox/orgfiles/z-life.org"
 			   "~/Dropbox/orgfiles/y-journals.org"
 			   "~/Dropbox/orgfiles/done.org"
-			   "~/Dropbox/orgfiles/journal/"
-                           ))
+			   ))
   ;; (setq org-agenda-files '("~/Dropbox/orgfiles"))
   ;; (setq org-agenda-files
-  ;;    "~/Dropbox/orgfiles/agenda.org")
+  ;; 	"~/Dropbox/orgfiles/agenda.org")
   (setq org-default-notes-file "~/Dropbox/orgfiles/work.org")
   (setq org-agenda-confirm-kill t)
   ;;open agenda in current window
-  (setq org-agenda-window-setup (quote current-window))
-  )
+  (setq org-agenda-window-setup (quote current-window)))
 
-(defun my/buffer-face-mode-variable ()
-  "Set font to a variable width (proportional) fonts in current buffer"
-  (interactive)
-  (setq buffer-face-mode-face '(:family "Roboto Slab"
-                                :height 180
-                                :width normal))
-  (buffer-face-mode))
-
-(defun my/style-org-agenda()
-  ;; (my/buffer-face-mode-variable)
-  (set-face-attribute 'org-agenda-date nil :height 1.1)
-  (set-face-attribute 'org-agenda-date-today nil :height 1.1 :slant 'italic)
-  (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
-
-(add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
-
-(setq org-agenda-breadcrumbs-separator " ❱ "
-      ;; org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
-      org-agenda-time-grid '((weekly today require-timed)
-                             (800 1000 1200 1400 1600 1800 2000)
-                             "......" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
-      org-agenda-prefix-format '((agenda . " %i %-10:c%?-16t%-4e% s")
-				 (todo . " %i %-10:c")
-				 (tags . " %i %-10:c")
-				 (search . " %i %-10:c"))
-)
-
-(setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                    "\n"
-                                                    (org-agenda-format-date-aligned date))))
-(setq org-cycle-separator-lines 2)
-
-(setq org-agenda-span 7
-    org-agenda-start-on-weekday nil
-    ;; org-agenda-start-day "-3d"
-    )
+;; (setq org-agenda-span 14
+;;     org-agenda-start-on-weekday nil
+;;     org-agenda-start-day "-3d")
 
   ;; ; ;; org-agenda
   ;; (use-package org-projectile
@@ -631,28 +572,6 @@
   ;;     (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files)))
   ;;     (push (org-projectile-project-todo-entry) org-capture-templates))
   ;;   :ensure t)
-
-(use-package org-super-agenda
-  :defer 2
-  :config
-  (org-super-agenda-mode)
-  )
-
-(setq org-super-agenda-groups
-      '(
-	;; (:name "⏰ Calendar" :time-grid t)
-	(:name "Today" ; Optionally specify section name
-	       :time-grid t  ; Items that appear on the time grid
-	       :todo "TODAY") ; Items that have this TODO keyword
-	(:name "⚠ Overdue!" :deadline past)
-	(:name "⚠ Overdue!" :scheduled past)
-	(:name "⭐ Important" :priority "A")
-	(:name "Optional" :priority "D" :order 90)
-	(:auto-category t)))
-
-;; (let ((org-super-agenda-groups
-;;        '((:auto-category t))))
-;;   (org-agenda-list))
 
 (setq org-default-priority ?A)
 (setq org-highest-priority ?A)
@@ -736,51 +655,31 @@
           )
         ))
 
-(use-package org-journal
-  :ensure t
-  :defer t
-  :bind
-  ("s-j" . org-journal-new-entry)
-  ("s-s" . org-journal-new-scheduled-entry)
-  ("s-n" . org-journal-open-next-entry)
-  ("s-p" . org-journal-open-previous-entry)
-  :init
-  ;; Change default prefix key; needs to be set before loading org-journal
-  (setq
-   org-journal-prefix-key "M-g "
-   org-journal-enable-agenda-integration t)
-  :config
-  (setq org-journal-dir (concat org-directory "/journal")
-        org-journal-file-type 'weekly
-        org-journal-file-format "%Y%m%d.org"
-        org-journal-date-format "%A, %Y-%m-%d"
-        ))
-
 (setq org-refile-targets '((("~/Dropbox/orgfiles/work.org"
 			   "~/Dropbox/orgfiles/z-life.org"
 			   "~/Dropbox/orgfiles/y-journals.org")
 			    :maxlevel . 2)))
 
-(setq org-present-text-scale 2)
+  (setq org-present-text-scale 2)
 
-(eval-after-load "org-present"
-  '(progn
-     (add-hook 'org-present-mode-hook
-               (lambda ()
-                 (org-present-big)
-                 (org-display-inline-images)
-                 (org-present-hide-cursor)
-                 (org-present-read-only)
-                 ;;(toggle-frame-fullscreen)
-                 ))
-     (add-hook 'org-present-mode-quit-hook
-               (lambda ()
-                 (org-present-small)
-                 (org-remove-inline-images)
-                 (org-present-show-cursor)
-                 (org-present-read-write)
-                 ;;(toggle-frame-fullscreen)
-                 ))))
+  (eval-after-load "org-present"
+    '(progn
+       (add-hook 'org-present-mode-hook
+                 (lambda ()
+                   (org-present-big)
+                   (org-display-inline-images)
+                   (org-present-hide-cursor)
+                   (org-present-read-only)
+                   ;;(toggle-frame-fullscreen)
+                   ))
+       (add-hook 'org-present-mode-quit-hook
+                 (lambda ()
+                   (org-present-small)
+                   (org-remove-inline-images)
+                   (org-present-show-cursor)
+                   (org-present-read-write)
+                   ;;(toggle-frame-fullscreen)
+                   ))))
 
 ;; (with-eval-after-load 'org
 ;;   (use-package org-toggl
@@ -801,7 +700,7 @@
 
 (use-package org-toggl
   :after org
-  :defer 15
+  :defer 3
   :init
   (setq toggl-auth-token "ce3e8fc3922edda6986a6e729509338f")
   (setq org-toggl-inherit-toggl-properties t)
@@ -810,20 +709,14 @@
   :config
   (toggl-get-projects)
   (org-toggl-integration-mode)
-  (define-key org-mode-map (kbd "C-c I") 'toggl-select-default-project)
-
   ;; remove clock-out since it failed at stopping toggl timer
   (remove-hook 'org-clock-out-hook #'org-toggl-clock-out)
   ;; bind C-c i to clock-in then clock-out
-  (define-key org-mode-map (kbd "C-c i")
-    (lambda () (interactive) (org-clock-in) (sit-for 5) (org-clock-out)))
-
-  ;; This is the originial setup. Need to invoke clock-in and clock-out to
-  ;; start and stop a projection
-  ;; (add-hook 'org-clock-out-hook #'org-toggl-clock-out)
-  ;; (define-key org-mode-map (kbd "C-c i") 'org-clock-in)
-  ;; (define-key org-mode-map (kbd "C-c o") 'org-clock-out)
-
+  ;; (define-key org-mode-map (kbd "C-c i")
+  ;;   (lambda () (interactive) (org-clock-in) (sit-for 5) (org-clock-out)))
+  (define-key org-mode-map (kbd "C-c I") 'toggl-select-default-project)
+  (define-key org-mode-map (kbd "C-c i") 'org-clock-in)
+  (define-key org-mode-map (kbd "C-c o") 'org-clock-out)
   )
 
   (setq org-file-apps
@@ -938,34 +831,8 @@
          :recursive t)
         ("all" :components ("body" "css" "attach"))))
 
-;; (require 'ox-extra)
-;; (ox-extras-activate '(ignore-headlines))
-;; (use-package ox-extra 
-;;   :config
-;;   (ox-extras-activate '(ignore-headlines))
-;;   )
-
-(setq
- org-ref-bibliography-notes "~/Academics/org-ref-notes.org"
- org-ref-default-bibliography '("~/folders-and-files/BIB_HE.bib")
- org-ref-pdf-directory "~/Academics/Papers/"
- ) 
-(setq bibtex-completion-bibliography '("~/folders-and-files/BIB_HE.bib"
-				       "~/folders-and-files/Books.bib")
-      bibtex-completion-library-path "~/Academics/Papers/"
-      bibtex-completion-notes-path "~/Dropbox/orgfiles/org-ref-notes.org"
-      )
-
-;; (use-package org-ref
-;;   :init
-;;   (setq bibtex-completion-bibliography '("~/folders-and-files/BIB_HE.bib"
-;; 					 "~/folders-and-files/Books.bib")
-;; 	bibtex-completion-library-path "~/Academics/Papers/"
-;; 	bibtex-completion-notes-path "~/Dropbox/orgfiles/org-ref-notes.org"
-;; 	)
-;;   )
-
-(use-package citeproc)
+  (require 'ox-extra)
+  (ox-extras-activate '(ignore-headlines))
 
 (use-package plain-org-wiki
   :ensure t
@@ -981,6 +848,19 @@
   (shell-command
    ;; (concat "open -a mail.app message:" id))))
    (concat "open message:" id))))
+
+(use-package org-super-agenda
+  :defer 2
+  :config
+  (org-super-agenda-mode)
+  )
+
+(setq org-super-agenda-groups
+       '((:auto-category t)))
+
+;; (let ((org-super-agenda-groups
+;;        '((:auto-category t))))
+;;   (org-agenda-list))
 
 (use-package org-fancy-priorities
   :diminish
@@ -1019,33 +899,6 @@
   :mode ("\\.org\\'" . org-mode)
   :config
   (add-hook 'org-mode-hook #'org-inline-pdf-mode))
-
-;; This setup is tested on Emacs 24.3 & Emacs 24.4 on Linux/OSX
-;; org v7 bundled with Emacs 24.3
-(setq org-export-odt-preferred-output-format "doc")
-;; org v8 bundled with Emacs 24.4
-(setq org-odt-preferred-output-format "doc")
-;; BTW, you can assign "pdf" in above variables if you prefer PDF format
-;; "doc" for word document
-
-;; Only OSX need below setup
-(defun my-setup-odt-org-convert-process ()
-  (interactive)
-  (let ((cmd "/Applications/LibreOffice.app/Contents/MacOS/soffice"))
-    (when (and (eq system-type 'darwin) (file-exists-p cmd))
-      ;; org v7
-      (setq org-export-odt-convert-processes '(("LibreOffice" "/Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to %f%x --outdir %d %i")))
-      ;; org v8
-      (setq org-odt-convert-processes '(("LibreOffice" "/Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to %f%x --outdir %d %i"))))
-    ))
-(my-setup-odt-org-convert-process)
-
-(setcar (nthcdr 0 org-emphasis-regexp-components) " \t('\"{[:nonascii:]")
-(setcar (nthcdr 1 org-emphasis-regexp-components) "- \t.,:!?;'\")}\\[[:nonascii:]")
-(org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
-(org-element-update-syntax)
-;; 规定上下标必须加 {}，否则中文使用下划线时它会以为是两个连着的下标
-(setq org-use-sub-superscripts "{}")
 
 (setq-default mode-require-final-newline nil)
 
@@ -1231,8 +1084,9 @@
 	("M-p" . outline-previous-heading)
 	("C-c C-c" . TeX-command-run-all)
 	("C-c l" . TeX-error-overview)
-	;; ((kbd "C-tab") . TeX-complete-symbol) 
+	;; ("C-tab" . TeX-complete-symbol) 
 	("C-c w" . juanjo:textcount))
+
   :config
   (setq TeX-auto-save t)
   (setq TeX-auto-save t)
@@ -1281,6 +1135,7 @@
   (setq TeX-view-program-selection '((output-pdf "PDF Viewer")))
   (setq TeX-view-program-list
 	'(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
+
   ;; keybindings
   ;; (define-key outline-mode-map [M-left] 'outline-hide-body)
   ;; (define-key outline-mode-map [M-right] 'outline-show-all)
@@ -1290,6 +1145,7 @@
   ;; (define-key outline-mode-map [C-M-right] 'outline-show-children)
   ;; (define-key outline-mode-map [C-M-up] 'outline-previous-visible-heading)
   ;; (define-key outline-mode-map [C-M-down] 'outline-next-visible-heading)
+
   (defun turn-on-outline-minor-mode () (outline-minor-mode 1))
   (add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
   (add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
@@ -1297,38 +1153,16 @@
   (add-hook 'LaTeX-mode-hook 'turn-on-flycheck-mode)
   )
 
-(setq org-latex-create-formula-image-program 'dvisvgm)
+  (use-package reftex)
+  (setq reftex-default-bibliography
+			'("/Users/chongchonghe/Academics/Bib/BIB_HE.bib"))
+  ;; (setq reftex-default-bibliography
+  ;; 	      '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib",
+  ;; 	"/Users/chongchonghe/Academics/Bib/Books.bib",
+  ;; 	"/Users/chongchonghe/Academics/Bib/Bib_HE_PhD.bib"))
 
-(setq org-preview-latex-default-process 'dvisvgm)
-;; (setq org-preview-latex-default-process 'divpng)
-
-;; (setq my:dvi-to-svg
-;;     (my:dvi-to-svg :programs
-;;         ("latex" "dvisvgm")
-;;            :description "dvi > svg"
-;;            :message "you need to install the programs: latex and dvisvgm."
-;;            :use-xcolor t
-;;            :image-input-type "dvi"
-;;            :image-output-type "svg"
-;;            :image-size-adjust (1.7 . 1.5)
-;;            :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-;;            :image-converter ("dvisvgm %f -e -n -b min -c %S -o %O")))
-;; (with-eval-after-load 'ox-latex
-;;     (add-to-list 'org-preview-latex-process-alist my:dvi-to-svg)
-;;     (setq org-preview-latex-default-process 'my:dvi-to-svg))
-
-(use-package preview-dvisvgm)
-
-(use-package reftex)
-(setq reftex-default-bibliography
-      '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib"))
-;; (setq reftex-default-bibliography
-;; 	      '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib",
-;; 	"/Users/chongchonghe/Academics/Bib/Books.bib",
-;; 	"/Users/chongchonghe/Academics/Bib/Bib_HE_PhD.bib"))
-
-(setq reftex-external-file-finders
-      '(("tex" . "/path/to/kpsewhich -format=.tex %f")
+  (setq reftex-external-file-finders
+  '(("tex" . "/path/to/kpsewhich -format=.tex %f")
 	("bib" . "/path/to/kpsewhich -format=.bib %f")))
 
   (use-package windresize
@@ -1337,14 +1171,14 @@
 		("C-c w" . windresize)
 		)
 
-(defun my-html2org-clipboard ()
+(defun my/html2org-clipboard ()
   "Convert clipboard contents from HTML to Org and then paste (yank)."
   (interactive)
-  (setq cmd "osascript -e 'the clipboard as \"HTML\"' | perl -ne 'print chr foreach unpack(\"C*\",pack(\"H*\",substr($_,11,-3)))' | pandoc -f html -t json | pandoc -f json -t org --wrap=none")
+  (setq cmd "osascript -e 'the clipboard as \"HTML\"' | perl -ne 'print chr foreach unpack(\"C*\",pack(\"H*\",substr($_,11,-3)))' | pandoc -f html -t json | pandoc -f json -t org")
   (kill-new (shell-command-to-string cmd))
   (yank))
 
-(define-key org-mode-map (kbd "s-V") #'my-html2org-clipboard)
+(define-key org-mode-map (kbd "s-V") #'my/html2org-clipboard)
 
   ;; ;; make swithing windows easier
   (global-set-key (kbd "M-p") (kbd "C-- C-x o"))
@@ -1375,8 +1209,7 @@
   (global-set-key (kbd "s-r") 'recompile)
   (global-set-key (kbd "s-,") 'previous-buffer)
   (global-set-key (kbd "s-.") 'next-buffer)
-  ;; (global-unset-key (kbd "s-j"))
-  ;; (global-set-key (kbd "s-j") 'jump-to-register)
+  (global-set-key (kbd "s-j") 'jump-to-register)
 
   ;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
@@ -1482,153 +1315,6 @@
 (add-hook 'neotree-mode-hook
 	  (lambda () (define-key evil-motion-state-local-map (kbd "g") 'neotree-refresh)))
 
-;; new
-(require 'elfeed)
-(setq elfeed-db-directory (expand-file-name "elfeed" user-emacs-directory)
-      elfeed-show-entry-switch 'display-buffer)
-(setq elfeed-feeds
-      '("http://export.arxiv.org/api/query?search_query=cat:astro-ph.GA&start=0&max_results=500&sortBy=submittedDate&sortOrder=descending"
-	"http://export.arxiv.org/api/query?search_query=cat:astro-ph.SR&start=0&max_results=500&sortBy=submittedDate&sortOrder=descending"
-	))
-;; https://www.reddit.com/r/emacs/comments/6z6xm6/comment/dmthpb7/?utm_source=share&utm_medium=web2x&context=3
-(add-to-list 'evil-motion-state-modes 'elfeed-search-mode)
-(add-to-list 'evil-motion-state-modes 'elfeed-show-mode)
-;; face for starred articles
-(defface elfeed-search-starred-title-face
-  '((t :foreground "#f77"))
-  "Marks a starred Elfeed entry.")
-(push '(star elfeed-search-starred-title-face) elfeed-search-face-alist)
-;; Default search filter
-(setq-default elfeed-search-filter "@1-week-ago -trash")
-;; https://emacs.stackexchange.com/a/2441/26582
-
-;; (use-package elfeed
-;;   :ensure t
-;;   :config
-;;   :bind
-;;   ("C-x w" . elfeed )
-;;   )
-
-(defun elfeed-tag-selection-as (mytag)
-  "Returns a function that tags an elfeed entry or selection as
-MYTAG"
-  (lambda ()
-    "Toggle a tag on an Elfeed search selection"
-    (interactive)
-    (elfeed-search-toggle-all mytag)))
-
-(defun elfeed-mark-all-as-read ()
-  (interactive)
-  (if (yes-or-no-p "Do you really want to mark everything as READ?")
-      (progn
-        (mark-whole-buffer)
-        (elfeed-search-untag-all-unread))
-    nil)
-  )
-
-(defalias 'elfeed-toggle-star
-  (elfeed-expose #'elfeed-search-toggle-all 'star))
-(defalias 'elfeed-toggle-starstar
-  (elfeed-expose #'elfeed-search-toggle-all 'star2))
-(defalias 'elfeed-toggle-read
-  (elfeed-expose #'elfeed-search-toggle-all 'unread))
-(defalias 'elfeed-toggle-trash
-  (elfeed-expose #'elfeed-search-toggle-all 'trash))
-(eval-after-load 'elfeed-search
-  '(progn
-     (define-key elfeed-search-mode-map (kbd "R") 'elfeed-mark-all-as-read)
-     (define-key elfeed-search-mode-map (kbd "M") (elfeed-tag-selection-as 'starstar))
-     (evil-define-key* 'motion elfeed-search-mode-map
-                       (kbd "RET") #'elfeed-search-show-entry
-                       "b" #'elfeed-search-browse-url
-                       "U" #'elfeed-update
-                       "m" #'elfeed-toggle-star
-                       "M" #'elfeed-toggle-starstar
-                       "r" #'elfeed-toggle-read
-                       "t" #'elfeed-toggle-trash
-                       "gr" #'elfeed-search-update--force
-                       "gR" #'elfeed-search-fetch)
-     ))
-;; (eval-after-load 'elfeed-search
-;;   '(define-key elfeed-search-mode-map (kbd "m") 'elfeed-toggle-star))
-
-;; (setq elfeed-show-mode-hook
-;;       (lambda ()
-;; 	(set-face-attribute 'variable-pitch (selected-frame)))
-;; 	)
-
-;; (defun my-show-elfeed (buffer)
-;;   (with-current-buffer buffer
-;;     (setq buffer-read-only nil)
-;;     (goto-char (point-min))
-;;     (re-search-forward "\n\n")
-;;     (fill-individual-paragraphs (point) (point-max))
-;;     (setq buffer-read-only t))
-;;   (switch-to-buffer buffer))
-
-;; (add-hook 'elfeed-show-mode-hook
-;; 	  (lambda () (buffer-face-set 'variable-pitch)))
-
-;; (add-hook 'elfeed-show-mode-hook 'variable-pitch-mode)
-
-(defun concatenate-authors (authors-list)
-  "Given AUTHORS-LIST, list of plists; return string of all authors concatenated."
-  (mapconcat
-   (lambda (author) (plist-get author :name))
-   authors-list ", "))
-
-(defun elfeed-search-format-date (date)
-  (format-time-string "%m-%d" (seconds-to-time date)))
-
-(use-package elfeed-goodies)
-
-(defun my-search-print-fn (entry)
-  "Print ENTRY to the buffer."
-
-  (let* ((title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
-	 (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
-	 (date (elfeed-search-format-date (elfeed-entry-date entry)))
-	 (feed (elfeed-entry-feed entry))
-	 (feed-title
-	  (when feed
-	    (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
-	 (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
-	 (tags-str (concat "[" (mapconcat 'identity tags ",") "]"))
-	 (title-width (- (window-width) elfeed-goodies/feed-source-column-width
-			 elfeed-goodies/tag-column-width 4))
-	 (title-column (elfeed-format-column
-			title (elfeed-clamp
-			       elfeed-search-title-min-width
-			       title-width
-			       title-width)
-			:left))
-	 (tag-column (elfeed-format-column
-		      tags-str 13
-		      :left))
-	 (feed-column (elfeed-format-column
-		       feed-title 11
-		       :left))
-	 (entry-authors (concatenate-authors
-			 (elfeed-meta entry :authors)))
-	 (authors-column (elfeed-format-column
-			  entry-authors 24
-			  :left))
-	 )
-
-    (if (>= (window-width) (* (frame-width) elfeed-goodies/wide-threshold))
-	(progn
-	  ;; (insert (propertize feed-column 'face 'elfeed-search-feed-face) " ")
-	  (insert (propertize date 'face 'elfeed-search-date-face) " ")
-          (insert (propertize tag-column 'face 'elfeed-search-tag-face) " ")
-          (insert (propertize authors-column
-                              'face 'elfeed-search-date-face
-                              'kbd-help entry-authors) " ")
-          (insert (propertize title 'face title-faces 'kbd-help title))
-          )
-      (insert (propertize title 'face title-faces 'kbd-help title)))))
-
-(setq elfeed-search-print-entry-function #'my-search-print-fn)
-
 ;; (use-package matlab-mode)
 
 (defun my-light-theme ()
@@ -1636,7 +1322,6 @@ MYTAG"
   (load-theme 'doom-one-light t)
   ;; (set-background-color "#e6e3df")
   (set-background-color "#fffcf7")
-  (set-foreground-color "#111")
   (my-org-set-light-todo-faces)
   )
 (defun my-dark-theme ()
@@ -1645,6 +1330,7 @@ MYTAG"
   (set-foreground-color "#eee")
   (my-org-set-dark-todo-faces)
   )
+
 (use-package doom-themes
   :ensure t
   :config
@@ -1656,46 +1342,34 @@ MYTAG"
   (my-light-theme)
   )
 
-;; mixed-pitch
-(use-package mixed-pitch
-  :hook
-  ;; If you want it in all text modes:
-  (text-mode . mixed-pitch-mode)
-  ;; (elfeed-show-mode . mixed-pitch-mode)
-  ;; not sure. ref: https://emacs-china.org/t/doom-emacs-mixed-pitch-set-height-org/16558
-  ;; (mixed-pitch-mode . #'solaire-mode-reset)
-  :config
   ;; Default font
   (set-face-attribute 'default nil :font "Monaco-16")
-  ;; (set-face-attribute 'variable-pitch nil :family "Helvetica Neue" :height 1.2)
-  (set-face-attribute 'variable-pitch nil :family "DejaVu Serif" :height 1.4)
-  (set-face-attribute 'fixed-pitch nil :family "Monaco" :height 0.8)
-  ;; bigger text for org-mode headings
-  (custom-theme-set-faces
-   'user
-   `(org-level-4 ((t (:inherit outline-4 :height 1.0))))
-   `(org-level-3 ((t (:inherit outline-3 :height 1.1))))
-   `(org-level-2 ((t (:inherit outline-2 :family "Helvetica Neue" :height 1.2))))
-   `(org-level-1 ((t (:inherit outline-1 :family "Helvetica Neue" :height 1.3))))
-   `(org-document-title ((t (:family "Helvetica Neue" :height 1.6 :underline nil))))
-   )
-  ;; (setq mixed-pitch-set-height t)
-  )
-(add-hook 'org-mode-hook #'org-superstar-mode)
 
-;;;中文与英文字体设置
-;; Setting English Font
-;; (set-face-attribute
-;;  'default nil :font "Monaco 14")
-;; Chinese Font
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-  (set-fontset-font (frame-parameter nil 'font)
-		    charset (font-spec :family "STHeiti" :height 1.0)))
-;; more options:
-;; "PingFang SC": ugly
-;; "STXihei": thicker
+  ;; mixed-pitch, https://gitlab.com/jabranham/mixed-pitch
+  (use-package mixed-pitch
+	:hook
+	;; If you want it in all text modes:
+	(text-mode . mixed-pitch-mode)
+	:config
+	(set-face-attribute 'variable-pitch nil :family "Helvetica Neue" :height 1.2)
+	(set-face-attribute 'fixed-pitch nil :family "Monaco" :height 1.0)
+	;; bigger text for org-mode headings
+	(custom-theme-set-faces
+	 'user
+	 `(org-level-4 ((t (:inherit outline-4 :height 1.0))))
+	 `(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+	 `(org-level-2 ((t (:inherit outline-2 :height 1.2))))
+	 `(org-level-1 ((t (:inherit outline-1 :height 1.3))))
+	 `(org-document-title ((t (:family "Helvetica Neue" :height 2.0 :underline nil))))
+	 )
+	)
 
-(when window-system (set-frame-size (selected-frame) 130 50))
+  (when window-system (set-frame-size (selected-frame) 130 50))
+
+  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font)
+                      charset (font-spec :family "PingFang SC"
+                                         :size 15)))
 
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c a") 'org-agenda)
@@ -1716,6 +1390,37 @@ MYTAG"
 ;; (with-eval-after-load 'org
 ;;   (define-key org-agenda-mode-map (kbd "j") #'org-agenda-next-item)
 ;;   (define-key org-agenda-mode-map (kbd "k") #'org-agenda-previous-item))
+
+;; (defun my-shrink ()
+;;   (interactive)
+;;   ;; (funcall (key-binding (kbd "C-u 39 C-x {")))
+;;   ;; (call-interactively (key-binding (kbd "C-u 39 C-x {")))
+;;   ;; (/ (loop repeat 39 collect (key-binding (kbd "C-u 39 C-x {"))))
+;;   ;; (/ (loop repeat n sum (funcall f arg)) n)
+;;   ;; (cl-loop repeat 39 (shrink-window-horizontally))
+;;   ;; (r 39 'shrink-window-horizontally 'nil')
+;;   'shrink-window-horizontally
+;;   'shrink-window-horizontally
+;;   'shrink-window-horizontally
+;;   'shrink-window-horizontally
+;;   )
+
+;; Saving Emacs Sessions
+;; (desktop-save-mode 1)
+
+;; (fset 'my-shrink (kbd "C-u 43 C-x {"))
+(defun my-shrink ()
+  (interactive)
+  (shrink-window-horizontally 43))
+(defun my-todo ()
+  (interactive)
+  ;; (delete-other-windows)
+  (split-window-right)
+  (evil-window-right)
+  (find-file "~/Dropbox/orgfiles/work.org")
+  (my-shrink)
+  )
+;; (my-todo)
 
 (defvar org-babel-eval-verbose t
   "A non-nil value makes `org-babel-eval' display")
@@ -1738,55 +1443,3 @@ STDERR with `org-babel-eval-error-notify'."
               (org-babel-eval-error-notify exit-code (buffer-string)))
             nil)
         (buffer-string)))))
-
-;; (defun my-shrink ()
-;;   (interactive)
-;;   ;; (funcall (key-binding (kbd "C-u 39 C-x {")))
-;;   ;; (call-interactively (key-binding (kbd "C-u 39 C-x {")))
-;;   ;; (/ (loop repeat 39 collect (key-binding (kbd "C-u 39 C-x {"))))
-;;   ;; (/ (loop repeat n sum (funcall f arg)) n)
-;;   ;; (cl-loop repeat 39 (shrink-window-horizontally))
-;;   ;; (r 39 'shrink-window-horizontally 'nil')
-;;   'shrink-window-horizontally
-;;   'shrink-window-horizontally
-;;   'shrink-window-horizontally
-;;   'shrink-window-horizontally
-;;   )
-
-;; Saving Emacs Sessions
-;; (desktop-save-mode 1)
-
-;; (fset 'my-shrink (kbd "C-u 43 C-x {"))
-(defun my-shrink ()
-  (interactive)
-  ;; (shrink-window-horizontally 60)
-  (evil-window-set-width 80)
-  )
-(defun my-todo ()
-  (interactive)
-  (split-window-right)
-  (evil-window-right 1)
-  ;; (find-file "~/Dropbox/orgfiles/work.org")
-  (org-agenda-list)
-  (my-shrink)
-  )
-
-;; open agenda list
-(org-agenda-list)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(yasnippet-snippets yasnippet-classic-snippets windresize use-package transpose-frame solarized-theme smooth-scrolling smooth-scroll smartparens skewer-mode simpleclip scala-mode request-deferred preview-dvisvgm plain-org-wiki page-break-lines ob-ipython neotree mu4e-maildirs-extension mu4e-conversation mu4e-alert moz-controller monitor mixed-pitch matlab-mode markdown-mode magit langtool key-chord julia-mode jedi impatient-mode hydra helm-org helm-flx helm-bibtex gruvbox-theme goto-last-change folding flycheck exec-path-from-shell evil-org evil-collection elpy elfeed-goodies ein edit-indirect dumb-jump doom-themes default-text-scale dashboard company-jedi clojure-mode cdlatex anaconda-mode)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:family "Helvetica Neue" :height 1.6 :underline nil))))
- '(org-level-1 ((t (:inherit outline-1 :family "Helvetica Neue" :height 1.3))))
- '(org-level-2 ((t (:inherit outline-2 :family "Helvetica Neue" :height 1.2))))
- '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
- '(org-level-4 ((t (:inherit outline-4 :height 1.0)))))

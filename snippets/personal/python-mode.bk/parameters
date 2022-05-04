@@ -36,7 +36,7 @@
             (setq template
                   (format (concat "%s${%d:%s: ${%d:type}\n"
                                   (make-string python-indent ? )
-                                  "${%d:description}\n}")
+                                  "${%d:description}\n\n}")
                           template
                           (incf count) narg (incf count) (incf count)))))
         (replace-regexp-in-string "}\\n}$" "}}" template))

@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 #name : parameters
-#key : args
+#key : parameters
 #type : command
 #contributor : MATSUBARA Naoya
 # --
@@ -52,7 +52,7 @@
                      (line-beginning-position 1)))
   (let ((indent (python-indent-calculate-indentation))
         (match)
-        (template "Parameters\n----------\n")
+        (template "Args:\n")
         (tmp-buf "*tmp sni-param*"))
     (save-excursion
       (while (and (re-search-backward "^[ \t]*\\(def\\|class\\)" nil t)
