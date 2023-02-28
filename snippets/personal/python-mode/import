@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-#name : import
-#key : impt
-#contributor : Chong-Chong He
-# --
-import numpy as np
-import matplotlib.pyplot as plt

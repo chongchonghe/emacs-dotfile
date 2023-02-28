@@ -1,0 +1,6 @@
+[submodule "packages/csl-styles"]
+	path = packages/csl-styles
+	url = https://github.com/citation-style-language/styles.git
+[submodule "packages/org-toggl"]
+	path = packages/org-toggl
+	url = git@github.com:mbork/org-toggl.git

@@ -1,0 +1,27 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /Users/chongchonghe/emacs-dotfile/init.org
+
+
+* org-refile
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-08-22 Mon 19:38
+:ARCHIVE_FILE: ~/emacs-dotfile/init.org
+:ARCHIVE_OLPATH: org-mode
+:ARCHIVE_CATEGORY: init
+:END:
+
+Ref:
+https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
+
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-targets '((("~/Dropbox/orgfiles")
+			    :maxlevel . 2)))
+;; (setq org-refile-targets '((("~/Dropbox/orgfiles/work.org"
+;; 			     ;; "~/Dropbox/orgfiles/proj.org"
+;; 			     "~/Dropbox/orgfiles/life.org"
+;; 			     "~/Dropbox/orgfiles/y-journals.org")
+;; 			    :maxlevel . 2)))
+#+END_SRC
+
