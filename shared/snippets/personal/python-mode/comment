@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: py-comment
-# key: #
+# key: cmt
 # --
 #---------- $1 ----------
 $0

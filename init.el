@@ -120,9 +120,6 @@
 ;; (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
-(setq compile-command "make ")
-;; (global-set-key (kbd "C-c r") #'recompile)
-
 ; from enberg on #emacs
 ;; (add-hook 'compilation-finish-functions
 ;;   (lambda (buf str)
@@ -306,10 +303,6 @@
 ;; (setq org-descriptive-links nil)
 
 (setq org-startup-indented t)
-
-;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
-(auto-fill-mode -1)
-(remove-hook 'text-mode-hook #'turn-on-auto-fill)
 
 (setq outline-blank-line 2)
 
@@ -1380,40 +1373,7 @@ prompting."
 ;;   :init (with-eval-after-load 'python (elpy-enable))
 ;;   )
 
-(defun python-args-to-google-docstring (text &optional make-fields)
-"Return a reST docstring format for the python arguments in yas-text."
-(let* ((indent (concat "\n" (make-string (current-column) 32)))
-		 (args (python-split-args text))
-	 (nr 0)
-		 (formatted-args
-	(mapconcat
-	 (lambda (x)
-		 (concat "    " (nth 0 x)
-			 (if make-fields (format " ${%d:arg%d}" (cl-incf nr) nr))
-			 (if (nth 1 x) (concat " \(default " (nth 1 x) "\)"))))
-	 args
-	 indent)))
-	(unless (string= formatted-args "")
-	(concat
-	 (mapconcat 'identity
-		(list "" "Args:" formatted-args)
-		indent)
-	 "\n"))))
-
 (use-package anaconda-mode)
-
-(use-package ein)
-;; (use-package ein
-;;   :config
-;;   (setq ob-ein-languages
-;;    (quote
-;;     (("ein-python" . python)
-;;      ("ein-R" . R)
-;;      ("ein-r" . R)
-;;      ("ein-rust" . rust)
-;;      ("ein-haskell" . haskell)
-;;      ("ein-julia" . julia))))
-;;   )
 
 (defun set-selective-display-dlw (&optional level)
 "Fold text indented same of more than the cursor.
@@ -1650,28 +1610,6 @@ F5 again will unset 'selective-display' by setting it to 0."
   (add-hook 'LaTeX-mode-hook 'turn-on-flycheck-mode)
   )
 
-(setq org-latex-create-formula-image-program 'dvisvgm)
-
-(setq org-preview-latex-default-process 'dvisvgm)
-;; (setq org-preview-latex-default-process 'divpng)
-
-;; (setq my:dvi-to-svg
-;;     (my:dvi-to-svg :programs
-;;         ("latex" "dvisvgm")
-;;            :description "dvi > svg"
-;;            :message "you need to install the programs: latex and dvisvgm."
-;;            :use-xcolor t
-;;            :image-input-type "dvi"
-;;            :image-output-type "svg"
-;;            :image-size-adjust (1.7 . 1.5)
-;;            :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-;;            :image-converter ("dvisvgm %f -e -n -b min -c %S -o %O")))
-;; (with-eval-after-load 'ox-latex
-;;     (add-to-list 'org-preview-latex-process-alist my:dvi-to-svg)
-;;     (setq org-preview-latex-default-process 'my:dvi-to-svg))
-
-(use-package preview-dvisvgm)
-
 (use-package reftex)
 (setq reftex-default-bibliography
       '("/Users/chongchonghe/Academics/Bib/BIB_HE.bib"))
@@ -1736,21 +1674,7 @@ F5 again will unset 'selective-display' by setting it to 0."
 
 (define-key org-mode-map (kbd "s-V") #'my-html2org-clipboard)
 
-;; ;; make swithing windows easier
-(global-set-key (kbd "M-p") (kbd "C-- C-x o"))
-(global-set-key (kbd "M-n") (kbd "C-x o"))
-(global-set-key (kbd "M-j") 'windmove-down)
-(global-set-key (kbd "M-k") 'windmove-up)
-(global-set-key (kbd "M-h") 'windmove-left)
-(global-set-key (kbd "M-l") 'windmove-right)
-;; (global-set-key (kbd "M-j") 'evil-window-down)
-;; (global-set-key (kbd "M-k") 'evil-window-up)
-;; (global-set-key (kbd "M-h") 'evil-window-left)
-;; (global-set-key (kbd "M-l") 'evil-window-right)
-(define-key evil-normal-state-map (kbd "M-h") #'evil-window-left)
-(define-key evil-normal-state-map (kbd "M-j") #'evil-window-down)
-(define-key evil-normal-state-map (kbd "M-k") #'evil-window-up)
-(define-key evil-normal-state-map (kbd "M-l") #'evil-window-right)
+
 
 (use-package transpose-frame
   :defer t)
@@ -1824,9 +1748,6 @@ F5 again will unset 'selective-display' by setting it to 0."
                           (bookmarks . 10)))
   (dashboard-setup-startup-hook)
   )
-
-(use-package helm-org)
-(use-package f)
 
 (use-package neotree
   :config

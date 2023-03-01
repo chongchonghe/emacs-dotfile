@@ -1,0 +1,78 @@
+
+* Jupyter notebook
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ein)
+;; (use-package ein
+;;   :config
+;;   (setq ob-ein-languages
+;;    (quote
+;;     (("ein-python" . python)
+;;      ("ein-R" . R)
+;;      ("ein-r" . R)
+;;      ("ein-rust" . rust)
+;;      ("ein-haskell" . haskell)
+;;      ("ein-julia" . julia))))
+;;   )
+#+end_src
+
+* PDF-tool
+
+Not using. Configure later typo here 
+
+#+begin_src emacs-lisp :tangle no
+  (require 'pdf-occur)
+  (use-package pdf-tools
+    :ensure t
+    :mode ("\\.pdf$" . pdf-view-mode)
+    :config
+    (pdf-tools-install)
+
+    (let ((foreground-orig (car pdf-view-midnight-colors)))
+      (setq pdf-view-midnight-colors 
+            (cons "white" "black")))
+
+    (with-eval-after-load 'evil
+      (progn
+        (add-to-list 'evil-emacs-state-modes 'pdf-outline-buffer-mode)
+        (add-to-list 'evil-emacs-state-modes 'pdf-view-mode))))
+
+  ;; (define-key pdf-occur-global-minor-mode-map (kbd "RET") 'pdf-occur-goto-occurance)
+
+  (use-package org-pdfview
+    :ensure t)
+#+END_SRC
+
+* f.el
+
+#+begin_src emacs-lisp :tangle yes
+(use-package helm-org)
+(use-package f)
+#+end_src
+
+* Folding mode (not using)
+
+** Usage
+
+Folding block are defined as =# {{{= and =# }}}= pairs (in python mode). Use the snippet '#{<tab>' to quick insert. Use <F9> to toggle folding.
+
+Source: https://www.emacswiki.org/emacs/FoldingMode#toc6
+
+** Config
+
+#+begin_src emacs-lisp :tangle no
+(use-package folding
+  :defer 20
+  :ensure t
+  :load-path "/Users/chongchonghe/dotfiles/emacs/packages/project-emacs--folding-mode"
+  :config
+  (folding-mode-add-find-file-hook)
+  (add-hook 'folding-mode
+	    (lambda () (local-set-key [f9] 'folding-toggle-show-hide)))
+  )
+#+end_src
+
+
+
+
+
