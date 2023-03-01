@@ -19,6 +19,12 @@
 
 (global-set-key (kbd "s-v") 'clipboard-yank)
 
+;; set snippets directory
+(yas-global-mode 1)
+(setq auto-completion-private-snippets-directory "~/emacs-dotfile/shared/snippets/personal")
+(setq yas-snippet-dirs (append yas-snippet-dirs '("~/emacs-dotfile/shared/snippets/personal")))
+(yas-reload-all)
+
 (defun python-args-to-google-docstring (text &optional make-fields)
 "Return a reST docstring format for the python arguments in yas-text."
 (interactive)
@@ -64,7 +70,8 @@
 ;;     (add-to-list 'org-preview-latex-process-alist my:dvi-to-svg)
 ;;     (setq org-preview-latex-default-process 'my:dvi-to-svg))
 
-
+(evil-define-key 'visual evil-surround-mode-map "s" 'evil-substitute)
+(evil-define-key 'visual evil-surround-mode-map "S" 'evil-surround-region)
 
 ;; (with-eval-after-load 'org
 ;;   (define-key org-mode-map (kbd "M-n") #'org-next-visible-heading)

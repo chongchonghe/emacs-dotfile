@@ -46,6 +46,16 @@ Define ~compile-command~ as ~make~
   (global-set-key (kbd "s-v") 'clipboard-yank)
 #+end_src
 
+* Auto complete (snippets)
+
+#+begin_src emacs-lisp :tangle yes
+  ;; set snippets directory
+  (yas-global-mode 1)
+  (setq auto-completion-private-snippets-directory "~/emacs-dotfile/shared/snippets/personal")
+  (setq yas-snippet-dirs (append yas-snippet-dirs '("~/emacs-dotfile/shared/snippets/personal")))
+  (yas-reload-all)
+#+end_src
+
 * Python
 
 Usage: =defg<tab>=. Ref: stackexchange, [[https://emacs.stackexchange.com/a/19471/26582][Library for automatically inserting python docstring in Google style]]
@@ -109,7 +119,8 @@ Source: https://emacs.stackexchange.com/a/34085
 ** Basic keys
 
 #+begin_src emacs-lisp :tangle yes
-
+  (evil-define-key 'visual evil-surround-mode-map "s" 'evil-substitute)
+  (evil-define-key 'visual evil-surround-mode-map "S" 'evil-surround-region)
 #+end_src
 
 ** Org mode keys

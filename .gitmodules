@@ -4,3 +4,6 @@
 [submodule "packages/org-toggl"]
 	path = packages/org-toggl
 	url = git@github.com:mbork/org-toggl.git
+[submodule "packages/plain-org-wiki"]
+	path = packages/plain-org-wiki
+	url = https://github.com/abo-abo/plain-org-wiki.git
