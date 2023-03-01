@@ -4,3 +4,9 @@
 [submodule "packages/plain-org-wiki"]
 	path = packages/plain-org-wiki
 	url = https://github.com/abo-abo/plain-org-wiki.git
+[submodule "packages/emacs-htmlize"]
+	path = packages/emacs-htmlize
+	url = https://github.com/hniksic/emacs-htmlize.git
+[submodule "packages/project-emacs--folding-mode"]
+	path = packages/project-emacs--folding-mode
+	url = https://github.com/jaalto/project-emacs--folding-mode.git
