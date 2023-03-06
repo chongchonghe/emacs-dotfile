@@ -7,11 +7,21 @@
 (setq compile-command "make ")
 ;; (global-set-key (kbd "C-c r") #'recompile)
 
+(setq org-hide-emphasis-markers t)
+
 (use-package windmove
   :config
   (windmove-default-keybindings 'super)
   (setq windmove-wrap-around t)
   )
+
+;; Make movement keys work like they should
+(define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+(define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+;; Make horizontal movement cross lines                                    
+(setq-default evil-cross-lines t)
 
 (with-eval-after-load 'org
   ;; here goes your Org config
@@ -21,8 +31,8 @@
 
 ;; set snippets directory
 (yas-global-mode 1)
-(setq auto-completion-private-snippets-directory "~/emacs-dotfile/shared/snippets/personal")
-(setq yas-snippet-dirs (append yas-snippet-dirs '("~/emacs-dotfile/shared/snippets/personal")))
+(setq auto-completion-private-snippets-directory "/startrek/chongchong/emacs-dotfile/shared/snippets/personal")
+(setq yas-snippet-dirs (append yas-snippet-dirs '("/startrek/chongchong/emacs-dotfile/shared/snippets/personal")))
 (yas-reload-all)
 
 (defun python-args-to-google-docstring (text &optional make-fields)
@@ -47,9 +57,13 @@
    "\n"))))
 
 ;; (require 'preview-dvisvgm)
-(with-eval-after-load 'TeX-mode
+(with-eval-after-load "latex"
   ;; here goes your Org config
   (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-all)
+  ;; not working
+  (define-key LaTeX-mode-map (kbd "M-n") 'outline-next-heading)
+  (define-key LaTeX-mode-map (kbd "M-p") 'outline-previous-heading)
+  (setq TeX-save-query nil)
   (setq org-latex-create-formula-image-program 'dvisvgm)
   (setq org-preview-latex-default-process 'dvisvgm)
   )
@@ -97,4 +111,7 @@
 ;; (global-set-key (kbd "s-j") 'jump-to-register)
 ;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
-(message "init-share.el sourced")
+(require 'windmove)
+(windmove-default-keybindings)
+
+(message "init-share.el sourced!!")

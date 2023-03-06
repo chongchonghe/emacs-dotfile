@@ -23,6 +23,12 @@ Define ~compile-command~ as ~make~
 ;; (global-set-key (kbd "C-c r") #'recompile)
 #+end_src
 
+Hiding markup elements in org-mode
+
+#+begin_src emacs-lisp :tangle yes
+(setq org-hide-emphasis-markers t)
+#+end_src
+
 * windmove
 
 #+begin_src emacs-lisp :tangle yes
@@ -31,6 +37,18 @@ Define ~compile-command~ as ~make~
     (windmove-default-keybindings 'super)
     (setq windmove-wrap-around t)
     )
+#+end_src
+
+* Evil mode
+
+#+begin_src emacs-lisp :tangle yes
+  ;; Make movement keys work like they should
+  (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+  ;; Make horizontal movement cross lines                                    
+  (setq-default evil-cross-lines t)
 #+end_src
 
 * org mode
@@ -51,8 +69,8 @@ Define ~compile-command~ as ~make~
 #+begin_src emacs-lisp :tangle yes
   ;; set snippets directory
   (yas-global-mode 1)
-  (setq auto-completion-private-snippets-directory "~/emacs-dotfile/shared/snippets/personal")
-  (setq yas-snippet-dirs (append yas-snippet-dirs '("~/emacs-dotfile/shared/snippets/personal")))
+  (setq auto-completion-private-snippets-directory "/startrek/chongchong/emacs-dotfile/shared/snippets/personal")
+  (setq yas-snippet-dirs (append yas-snippet-dirs '("/startrek/chongchong/emacs-dotfile/shared/snippets/personal")))
   (yas-reload-all)
 #+end_src
 
@@ -85,14 +103,21 @@ Usage: =defg<tab>=. Ref: stackexchange, [[https://emacs.stackexchange.com/a/1947
 
 * Latex
 
+My latex commands are installed in ~/startrek/chongchong/local/texlive/~. 
+
+Some keybindings in latex mode.
 Set preview image format as svg. Note: this rely on the use of [[https://github.com/railwaycat/homebrew-emacsmacport/releases][Yamamoto's Emacs a.k.a. Emacs Mac Port]], which has =svg= support. Regular emacs downloaded from emacsformacosx.com will not work.
 Source: https://emacs.stackexchange.com/a/34085
 
 #+begin_src emacs-lisp :tangle yes
   ;; (require 'preview-dvisvgm)
-  (with-eval-after-load 'TeX-mode
+  (with-eval-after-load "latex"
     ;; here goes your Org config
     (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-all)
+    ;; not working
+    (define-key LaTeX-mode-map (kbd "M-n") 'outline-next-heading)
+    (define-key LaTeX-mode-map (kbd "M-p") 'outline-previous-heading)
+    (setq TeX-save-query nil)
     (setq org-latex-create-formula-image-program 'dvisvgm)
     (setq org-preview-latex-default-process 'dvisvgm)
     )
@@ -157,6 +182,11 @@ Source: https://emacs.stackexchange.com/a/34085
 
 ** Make swithing windows easier (not using)
 
+#+begin_src emacs-lisp :tangle yes
+  (require 'windmove)
+  (windmove-default-keybindings)
+#+end_src
+
 Not using. Use windmove default (super + arrows) instead. 
 
 #+begin_src emacs-lisp :tangle no
@@ -199,5 +229,5 @@ Not using. Use windmove default (super + arrows) instead.
 * End message
 
 #+begin_src emacs-lisp :tangle yes
-  (message "init-share.el sourced")
+  (message "init-share.el sourced!!")
 #+end_src
