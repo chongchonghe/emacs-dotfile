@@ -8,6 +8,8 @@
 
 (setq org-hide-emphasis-markers t)
 
+(set-default 'truncate-lines t)
+
 ;; close all buffers
 (defun my-close-all-buffers ()
   (interactive)
@@ -25,6 +27,16 @@
 ;;   ;; here goes your Org config
 ;;   )
 (setq-default org-startup-with-inline-images nil)
+
+;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/emacs-liveorg"))
+;; (require 'liveorg)
+(use-package liveorg
+  :defer 5
+  :load-path "~/emacs-dotfile/packages/emacs-liveorg"
+  :config
+  ;; (setq liveorg-browser "Safari.app")
+  (define-key org-mode-map "\C-cE" 'liveorg-preview)
+  )
 
 (global-set-key (kbd "s-v") 'clipboard-yank)
 

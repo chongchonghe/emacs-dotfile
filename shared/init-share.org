@@ -64,6 +64,21 @@ Set truncate line as default
   (setq-default org-startup-with-inline-images nil)
 #+end_src
 
+** liveorg
+
+#+begin_src emacs-lisp :tangle yes
+  ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/emacs-liveorg"))
+  ;; (require 'liveorg)
+  (use-package liveorg
+    :defer 5
+    :load-path "~/emacs-dotfile/packages/emacs-liveorg"
+    :config
+    ;; (setq liveorg-browser "Safari.app")
+    (define-key org-mode-map "\C-cE" 'liveorg-preview)
+    )
+#+end_src
+
+
 * Clipboard
 #+begin_src emacs-lisp :tangle yes
   (global-set-key (kbd "s-v") 'clipboard-yank)
