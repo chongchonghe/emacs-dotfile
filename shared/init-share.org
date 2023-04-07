@@ -28,7 +28,13 @@ Hiding markup elements in org-mode. [[https://emacs.stackexchange.com/questions/
 (setq org-hide-emphasis-markers t)
 #+end_src
 
-* Functions
+Set truncate line as default
+
+#+begin_src emacs-lisp :tangle yes
+  (set-default 'truncate-lines t)
+#+end_src
+
+* windmove
 
 #+begin_src emacs-lisp :tangle yes
   ;; close all buffers
