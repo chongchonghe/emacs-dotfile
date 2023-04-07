@@ -10,3 +10,6 @@
 [submodule "packages/project-emacs--folding-mode"]
 	path = packages/project-emacs--folding-mode
 	url = https://github.com/jaalto/project-emacs--folding-mode.git
+[submodule "packages/emacs-livedown"]
+	path = packages/emacs-livedown
+	url = https://github.com/shime/emacs-livedown.git

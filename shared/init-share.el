@@ -5,34 +5,35 @@
 (remove-hook 'text-mode-hook #'turn-on-auto-fill)
 
 (setq compile-command "make ")
-;; (global-set-key (kbd "C-c r") #'recompile)
 
 (setq org-hide-emphasis-markers t)
 
-(use-package windmove
-  :config
-  (windmove-default-keybindings 'super)
-  (setq windmove-wrap-around t)
-  )
+;; close all buffers
+(defun my-close-all-buffers ()
+  (interactive)
+  (mapc 'kill-buffer (buffer-list)))
 
-;; Make movement keys work like they should
-(define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
-(define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
-(define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
-(define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+;; evil mode, move visual line instead of real line
+(setq evil-respect-visual-line-mode t)
 ;; Make horizontal movement cross lines                                    
 (setq-default evil-cross-lines t)
+;; ;; Make movement keys work like they should
+(define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
 
-(with-eval-after-load 'org
-  ;; here goes your Org config
-  )
+;; (with-eval-after-load 'org
+;;   ;; here goes your Org config
+;;   )
+(setq-default org-startup-with-inline-images nil)
 
 (global-set-key (kbd "s-v") 'clipboard-yank)
 
 ;; set snippets directory
 (yas-global-mode 1)
-(setq auto-completion-private-snippets-directory "/startrek/chongchong/emacs-dotfile/shared/snippets/personal")
-(setq yas-snippet-dirs (append yas-snippet-dirs '("/startrek/chongchong/emacs-dotfile/shared/snippets/personal")))
+;; (setq auto-completion-private-snippets-directory "/startrek/chongchong/emacs-dotfile/shared/snippets/personal")
+;; (setq yas-snippet-dirs (append yas-snippet-dirs '("/startrek/chongchong/emacs-dotfile/shared/snippets/personal")))
+;; (setq auto-completion-private-snippets-directory "~/emacs-dotfile/shared/snippets/personal")
+(setq yas-snippet-dirs (append yas-snippet-dirs '("~/emacs-dotfile/shared/snippets/personal")))
 (yas-reload-all)
 
 (defun python-args-to-google-docstring (text &optional make-fields)
@@ -66,6 +67,7 @@
   (setq TeX-save-query nil)
   (setq org-latex-create-formula-image-program 'dvisvgm)
   (setq org-preview-latex-default-process 'dvisvgm)
+  (add-hook 'LaTeX-mode-hook 'outline-minor-mode)
   )
 ;; (setq org-preview-latex-default-process 'divpng)
 
@@ -84,6 +86,21 @@
 ;;     (add-to-list 'org-preview-latex-process-alist my:dvi-to-svg)
 ;;     (setq org-preview-latex-default-process 'my:dvi-to-svg))
 
+;; accept completion from copilot and fallback to company
+
+(with-eval-after-load 'company
+  ;; disable inline previews
+  (delq 'company-preview-if-just-one-frontend company-frontends))
+
+(with-eval-after-load 'copilot
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
+
+(add-hook 'prog-mode-hook 'copilot-mode)
+
+(define-key evil-insert-state-map (kbd "C-<tab>") 'copilot-accept-completion-by-word)
+(define-key evil-insert-state-map (kbd "C-TAB") 'copilot-accept-completion-by-word)
+
 (evil-define-key 'visual evil-surround-mode-map "s" 'evil-substitute)
 (evil-define-key 'visual evil-surround-mode-map "S" 'evil-surround-region)
 
@@ -91,6 +108,8 @@
 ;;   (define-key org-mode-map (kbd "M-n") #'org-next-visible-heading)
 ;;   (evil-define-key 'normal org-mode-map (kbd "M-n") #'org-next-visible-heading)
 ;;   )
+
+;; (define-key org-agenda-mode-map (kbd "C-n") 'org-agenda-next-line)
 
 (defun my-org-mode-config ()
   (local-set-key "\M-n" 'outline-next-visible-heading)
@@ -112,6 +131,11 @@
 ;; (global-set-key (kbd "M-v") 'evil-paste-after)
 
 (require 'windmove)
-(windmove-default-keybindings)
+(windmove-default-keybindings 'super)
+(setq windmove-wrap-around t)
+(global-set-key (kbd "<S-s-down>") 'windmove-swap-states-down)
+(global-set-key (kbd "<S-s-up>") 'windmove-swap-states-up)
+(global-set-key (kbd "<S-s-left>") 'windmove-swap-states-left)
+(global-set-key (kbd "<S-s-right>") 'windmove-swap-states-right)
 
 (message "init-share.el sourced!!")
